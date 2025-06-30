@@ -4,10 +4,11 @@
 #define SRC "source/"
 #define BIN "bin/"
 #define INC "include/"
+#define ASMINC INC "asm/"
 
 #define CFLAGS "-O2 -Wall -Wextra -Wpedantic -Werror " /* optimize the code moderately (level 2) */                     \
                "-std=c99 "                             /* use the c99 language standard */                              \
-               "-m16 --march=i386 "                    /* generate 16-bit code; target the i386 architecture */         \
+               "-m16 -march=i386 "                     /* generate 16-bit code; target the i386 architecture */         \
                "-fno-stack-protector "                 /* disable stack smashing protection */                          \
                "-ffreestanding "                       /* compile without assuming standard library or startup files */ \
                "-I " INC                               /* add the directory in INC as an include path */
@@ -21,9 +22,32 @@
 
 int main(int argc, char **argv)
 {
+    neocmd_t *cmd, *clean;
     neorebuild("neo.c", argv, &argc);
 
-    neo_compile_to_object_file(GCC, SRC "gritty.c", NULL, CFLAGS, false);
-    neo_link(GCC, BIN "gritty", NULL, false, SRC "main.o");
+    if (argc > 1 && !strcmp(argv[1], "clean"))
+    {
+        clean = neocmd_create(BASH);
+        neocmd_append(clean, "rm -f " BIN "*.o " BIN "*.com");
+        neocmd_run_sync(clean, NULL, NULL, false);
+        neocmd_delete(clean);
+        return EXIT_SUCCESS;
+    }
+
+    neo_compile_to_object_file(GCC, SRC "gritty.c", BIN "gritty.o", CFLAGS, false);
+
+    cmd = neocmd_create(BASH);
+
+    // assemble xgfx.asm
+    neocmd_append(cmd, "nasm -i" ASMINC);
+    neocmd_append(cmd, "-f elf");
+    neocmd_append(cmd, SRC "xgfx.asm");
+    neocmd_append(cmd, "-o", BIN "xgfx.o");
+    neocmd_run_sync(cmd, NULL, NULL, false);
+
+    // link xgfx.o with gritty.o
+    neo_link(LD, BIN "gritty.com", LFLAGS, false, BIN "gritty.o", BIN "xgfx.o");
+
+    neocmd_delete(cmd);
     return EXIT_SUCCESS;
 }
