@@ -6,14 +6,15 @@
 #define INC "include/"
 #define ASMINC INC "asm/"
 
-#define CFLAGS "-O2 -Wall -Wextra -Wpedantic -Werror " /* optimize the code moderately (level 2) */                     \
+#define CFLAGS "-O0 -Wall -Wextra -Wpedantic -Werror " /* optimize the code moderately (level 2) */                     \
                "-std=c99 "                             /* use the c99 language standard */                              \
                "-m16 -march=i386 "                     /* generate 16-bit code; target the i386 architecture */         \
                "-fno-stack-protector "                 /* disable stack smashing protection */                          \
                "-ffreestanding "                       /* compile without assuming standard library or startup files */ \
-               "-I " INC                               /* add the directory in INC as an include path */
+               "-fno-pic -fno-pie "                                                                                     \
+               "-I " INC /* add the directory in INC as an include path */
 
-#define LFLAGS "--nmagic --script=gritty.ld"
+#define LFLAGS "-nmagic --script=gritty.ld -m elf_i386" // x86-64 output is default; so we change it to elf_i386
 /* --nmagic disables automatic page alignment of output sections like .text and .data */
 /* this makes the final binary smaller by preventing extra padding added to align sections to memory pages (typically 4kb) */
 /* it also allows more precise control over layout, which is important in low-level, freestanding, or bootloader environments */
@@ -40,9 +41,10 @@ int main(int argc, char **argv)
 
     // assemble xgfx.asm
     neocmd_append(cmd, "nasm -i" ASMINC);
-    neocmd_append(cmd, "-f elf");
+    neocmd_append(cmd, "-f elf32");
     neocmd_append(cmd, SRC "xgfx.asm");
     neocmd_append(cmd, "-o", BIN "xgfx.o");
+
     neocmd_run_sync(cmd, NULL, NULL, false);
 
     // link xgfx.o with gritty.o

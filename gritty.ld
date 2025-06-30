@@ -1,4 +1,8 @@
-OUTPUT_FORMAT(raw_binary)    /* output a raw binary file with no elf or other headers */
+OUTPUT_FORMAT(binary)    /* output a raw binary file with no elf or other headers */
+
+/* the order of .text sections here follows the order of object files
+   passed to the linker on the command line (e.g. a.o, then b.o, etc);
+   to control section order explicitly, use *(file.o(.text)) */
 
 SECTIONS
 {
