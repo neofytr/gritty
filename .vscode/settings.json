@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "random": "c",
+        "cmath": "c",
+        "tuple": "c",
+        "type_traits": "c"
+    }
+}
