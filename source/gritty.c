@@ -3,16 +3,8 @@ __asm__(
     "call exit\n");
 
 #include <gritty.h>
-
-extern void write(char chr);
-
-void test(char chr)
-{
-    (void)chr;
-    return;
-}
 void main()
 {
-    test('a');
+    write('a');
     return;
 }

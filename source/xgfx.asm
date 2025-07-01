@@ -7,6 +7,9 @@ bits   16
 ; and then issue the ret instruction which 
 ; will pop the return address from the stack and jump to it
 
+; GCC expects it's own 32-bit ABI even in 16-bit real mode
+; we need to follow this ABI in the functions that are called from the C code
+
 global exit
 global write
 
@@ -42,15 +45,14 @@ exit:
     ; 0x33
     ; 
 
-
 write:
-    push bp     ; save the base ptr
-    mov  bp, sp ; make the current stack ptr the current base ptr
+    push ebp      ; save the base ptr
+    mov  ebp, esp ; make the current stack ptr the current base ptr
 
-    mov dl, [bp + 4]
-    mov ah, 0x02     ; int 0x21 with ah = 0x02 prints the character in dl
+    mov dl, BYTE [ebp + 8]
+    mov ah, 0x02           ; int 0x21 with ah = 0x02 prints the character in dl
     int 0x21
 
-    mov sp, bp
-    pop bp
+    mov esp, ebp
+    pop ebp
     ret 
