@@ -110,6 +110,9 @@ boolean draw_line(line_t *line)
             }
 
             // draw the point; return false if failed
+            if (point.x > max_x || point.y > max_y)
+                continue;
+
             if (!draw_point(&point))
                 return false;
         }
