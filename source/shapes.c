@@ -155,6 +155,73 @@ line_t *mk_line(point_t *one, point_t *two, uint16_t thickness, uint8_t color)
     return line;
 }
 
+rectangle_t *mk_rect(point_t *one, point_t *three, uint16_t thickness, uint8_t fg_color, uint8_t bg_color, boolean filled)
+{
+    if (!one || !three || !thickness)
+        return NULL;
+
+    rectangle_t *rect = alloc(sizeof(rectangle_t));
+    if (!rect)
+        return NULL;
+
+    rect->one = one;
+    rect->three = three;
+    rect->thickness = thickness;
+    rect->fg_color = fg_color;
+    rect->bg_color = bg_color;
+    rect->filled = filled;
+
+    return rect;
+}
+
+boolean draw_rect(rectangle_t *rect)
+{
+    point_t one, two, three, four;
+    line_t line_one, line_two, line_three, line_four;
+    if (!rect || !rect->one || !rect->three)
+        return false;
+
+    one = *rect->one;
+    three = *rect->three;
+
+    two.x = three.x;
+    two.y = one.y;
+
+    four.x = one.x;
+    four.y = three.y;
+
+    line_one.one = &one;
+    line_one.two = &two;
+    line_one.color = rect->bg_color;
+    line_one.thickness = rect->thickness;
+
+    line_two.one = &two;
+    line_two.two = &three;
+    line_two.color = rect->bg_color;
+    line_two.thickness = rect->thickness;
+
+    line_three.one = &three;
+    line_three.two = &four;
+    line_three.color = rect->bg_color;
+    line_three.thickness = rect->thickness;
+
+    line_four.one = &four;
+    line_four.two = &one;
+    line_four.color = rect->bg_color;
+    line_four.thickness = rect->thickness;
+
+    if (!draw_line(&line_one) || !draw_line(&line_two) || !draw_line(&line_three) || !draw_line(&line_four))
+        return false;
+
+    if (rect->filled)
+    {
+        if (!draw_rect_filled(rect))
+            return false;
+    }
+
+    return true;
+}
+
 boolean draw_point(point_t *point)
 {
     boolean ret = false;

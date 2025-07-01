@@ -64,9 +64,11 @@ void freeall(void)
 }
 void main()
 {
-    point_t *one = mk_point(0, 0, 0);
-    point_t *two = mk_point(10, 15, 0);
-    line_t *line = mk_line(one, two, 1, 0);
+    point_t *one, *two, *line;
+
+    one = mk_point(0, 0, 0);
+    two = mk_point(10, 15, 0);
+    line = mk_line(one, two, 1, 0);
 
     video_mode(BW_TEXT_MODE);
     draw_line(line);
