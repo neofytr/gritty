@@ -16,8 +16,18 @@ typedef struct packed
     uint8_t color : 4; // our color pallette supports c0 to cfff (16 colors), so we need only 4 bits
 } point_t;
 
+// the color field does nothing in the B/W Text mode
+typedef struct packed
+{
+    point_t *one, *two;
+    uint16_t thickness;
+    uint8_t color : 4;
+} line_t;
+
 void video_mode(uint8_t mode);
 boolean draw_point(point_t *point);
 point_t *mk_point(uint16_t x, uint16_t y, uint8_t color);
+line_t *mk_line(point_t *one, point_t *two, uint16_t thickness, uint8_t color);
+boolean draw_line(line_t *line);
 
 #endif

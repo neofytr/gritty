@@ -40,6 +40,23 @@ point_t *mk_point(uint16_t x, uint16_t y, uint8_t color)
     return point;
 }
 
+line_t *mk_line(point_t *one, point_t *two, uint16_t thickness, uint8_t color)
+{
+    if (!one || !two || !thickness)
+        return NULL;
+
+    line_t *line = alloc(sizeof(line_t));
+    if (!line)
+        return NULL;
+
+    line->one = one;
+    line->two = two;
+    line->thickness = thickness;
+    line->color = color;
+
+    return line;
+}
+
 boolean draw_point(point_t *point)
 {
     boolean ret = false;
