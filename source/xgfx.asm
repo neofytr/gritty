@@ -28,12 +28,27 @@ exit:
     pop bp     ; restore the base ptr
     ret
 
+    ; all stack pushes are 16-bit regardless
+
+    ; arg (high order byte)
+    ; arg (low order byte)
+    ; return address (high order byte)
+    ; return address (low order byte)
+    ; prev base ptr (high order byte)
+    ; prev base ptr (low order byte) <- sp, bp (just after prologue)
+
+    ; 0x61
+    ; 0x00 
+    ; 0x33
+    ; 
+
+
 write:
     push bp     ; save the base ptr
     mov  bp, sp ; make the current stack ptr the current base ptr
 
-    mov dl, 0x41 ; moving character 'A' into DL
-    mov ah, 0x02 ; int 0x21 with ah = 0x02 prints the character in dl
+    mov dl, [bp + 4]
+    mov ah, 0x02     ; int 0x21 with ah = 0x02 prints the character in dl
     int 0x21
 
     mov sp, bp

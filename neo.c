@@ -23,15 +23,15 @@
 
 int main(int argc, char **argv)
 {
-    neocmd_t *cmd, *clean;
+    neocmd_t *cmd, *tmp, *as;
     neorebuild("neo.c", argv, &argc);
 
     if (argc > 1 && !strcmp(argv[1], "clean"))
     {
-        clean = neocmd_create(BASH);
-        neocmd_append(clean, "rm -f " BIN "*.o " BIN "*.com");
-        neocmd_run_sync(clean, NULL, NULL, false);
-        neocmd_delete(clean);
+        cmd = neocmd_create(BASH);
+        neocmd_append(cmd, "rm -f " BIN "*.o " BIN "*.com");
+        neocmd_run_sync(cmd, NULL, NULL, false);
+        neocmd_delete(cmd);
         return EXIT_SUCCESS;
     }
 
@@ -49,6 +49,26 @@ int main(int argc, char **argv)
 
     // link xgfx.o with gritty.o
     neo_link(LD, BIN "gritty.com", LFLAGS, false, BIN "gritty.o", BIN "xgfx.o");
+
+    as = neocmd_create(BASH);
+    neocmd_append(as, "gcc -S", SRC "gritty.c", "-o", BIN "gritty.asm", CFLAGS);
+    neocmd_run_sync(as, NULL, NULL, false);
+
+    if (argc > 1 && !strcmp(argv[1], "dis"))
+    {
+        tmp = neocmd_create(BASH);
+        neocmd_append(tmp, "objdump -D -b binary -m i8086 --disassembler-options=intel", BIN "gritty.com");
+        neocmd_run_sync(tmp, NULL, NULL, false);
+        neocmd_delete(tmp);
+    }
+
+    if (argc > 1 && !strcmp(argv[1], "run"))
+    {
+        tmp = neocmd_create(BASH);
+        neocmd_append(tmp, "dosbox", BIN "gritty.com");
+        neocmd_run_sync(tmp, NULL, NULL, false);
+        neocmd_delete(tmp);
+    }
 
     neocmd_delete(cmd);
     return EXIT_SUCCESS;

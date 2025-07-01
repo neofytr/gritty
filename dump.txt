@@ -1,0 +1,9 @@
+
+[INFO] [neorebuild] No rebuild required for neo.c (not modified)
+[INFO] [neo_compile_to_object_file] Output file 'bin/gritty.o' is up to date - skipping compilation
+[INFO] [neocmd_run_async] nasm -iinclude/asm/ -f elf32 source/xgfx.asm -o bin/xgfx.o 
+[INFO] [neo_link_null] Forced linking disabled
+[INFO] [neo_link_null] The file 'bin/xgfx.o' is newer than the executable; Linking will be done
+[INFO] [neocmd_run_async] ld -o bin/gritty.com bin/gritty.o bin/xgfx.o -nmagic --script=gritty.ld -m elf_i386 
+[INFO] [neo_link_null] Successfully linked 'bin/gritty.com'
+[INFO] [neocmd_run_async] objdump -D -b binary -m i8086 --disassembler-options=intel bin/gritty.com 

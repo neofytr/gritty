@@ -1,13 +1,18 @@
-__asm__(".code16gcc\n"
-        "call main\n"
-        "call exit\n");
+__asm__(
+    "call main\n"
+    "call exit\n");
 
 #include <gritty.h>
 
-extern void write(void);
+extern void write(char chr);
 
+void test(char chr)
+{
+    (void)chr;
+    return;
+}
 void main()
 {
-    write();
+    test('a');
     return;
 }
