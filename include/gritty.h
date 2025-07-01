@@ -3,13 +3,6 @@
 
 #include <stdint.h>
 
-#define true 1
-#define false 0
-
-#define NULL ((void *)0)
-
-typedef uint8_t bool;
-
 extern uint8_t __heap; // symbol exported by the linker script
 
 void print(uint8_t *str);

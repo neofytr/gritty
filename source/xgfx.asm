@@ -13,6 +13,7 @@ bits   16
 global exit
 global xwrite
 global xputchar
+global xvideo_mode
 
 exit:
     ; function prologue
@@ -66,6 +67,18 @@ xputchar:
     mov ah, 0x0E
     xor bh, bh
     xor bl, bl
+    int 0x10
+
+    mov esp, ebp
+    pop ebp
+    ret
+
+xvideo_mode:
+    push ebp
+    mov  ebp, esp
+
+    arg al, 0  ; put the mode argument into al 
+    xor ah, ah
     int 0x10
 
     mov esp, ebp

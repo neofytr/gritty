@@ -4,9 +4,10 @@ __asm__(
 
 #include <gritty.h>
 #include <assembly.h>
+#include <base.h>
 
 static void *curr_heap;
-static bool alloc_init = false;
+static boolean alloc_init = false;
 
 void putchar(uint8_t chr)
 {
