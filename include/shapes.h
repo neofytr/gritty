@@ -24,6 +24,7 @@ typedef struct packed
     uint8_t color : 4;
 } line_t;
 
+// color field is ignored for B/W text mode
 typedef struct packed
 {
     point_t *one, *three; // two diagonally opposite points

@@ -215,8 +215,6 @@ boolean draw_rect(rectangle_t *rect)
 
     if (rect->filled)
     {
-        if (!draw_rect_filled(rect))
-            return false;
     }
 
     return true;
