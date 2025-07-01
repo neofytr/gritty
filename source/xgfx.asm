@@ -11,12 +11,12 @@ bits   16
 ; we need to follow this ABI in the functions that are called from the C code
 
 global exit
-global write
+global xputchar
 
 exit:
     ; function prologue
-    push bp     ; save the base ptr
-    mov  bp, sp ; make the current stack ptr the current base ptr
+    push ebp      ; save the base ptr
+    mov  ebp, esp ; make the current stack ptr the current base ptr
 
     xor ah, ah
     int 0x21   ; exit the program (int 0x21 with ah = 0 returns the control back the OS (MS-DOS)
@@ -27,8 +27,8 @@ exit:
     jmp .halt
 
     ; function epilogue
-    mov sp, bp ; restore the stack ptr
-    pop bp     ; restore the base ptr
+    mov esp, ebp ; restore the stack ptr
+    pop ebp      ; restore the base ptr
     ret
 
     ; all stack pushes are 16-bit regardless
@@ -45,7 +45,7 @@ exit:
     ; 0x33
     ; 
 
-write:
+xputchar:
     push ebp      ; save the base ptr
     mov  ebp, esp ; make the current stack ptr the current base ptr
 
