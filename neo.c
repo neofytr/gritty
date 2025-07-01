@@ -61,7 +61,7 @@ int main(int argc, char **argv)
         neocmd_run_sync(tmp, NULL, NULL, false);
         neocmd_delete(cmd);
         neocmd_delete(tmp);
-        return EXIT_FAILURE;
+        return EXIT_SUCCESS;
     }
 
     neo_compile_to_object_file(GCC, SRC "gritty.c", BIN "gritty.o", CFLAGS, false);
