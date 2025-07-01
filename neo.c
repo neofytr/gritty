@@ -6,6 +6,8 @@
 #define INC "include/"
 #define ASMINC INC "asm/"
 
+#define MAX_BUFLEN (2048 + 1)
+
 #define CFLAGS "-O0 -Wall -Wextra -Wpedantic " /* optimize the code moderately (level 2) */                     \
                "-std=c99 "                     /* use the c99 language standard */                              \
                "-m16 -march=i386 "             /* generate 16-bit code; target the i386 architecture */         \
@@ -24,18 +26,46 @@
 int main(int argc, char **argv)
 {
     neocmd_t *cmd, *tmp, *as;
+    char buf[MAX_BUFLEN];
     neorebuild("neo.c", argv, &argc);
 
     if (argc > 1 && !strcmp(argv[1], "clean"))
     {
         cmd = neocmd_create(BASH);
-        neocmd_append(cmd, "rm -f " BIN "*.o " BIN "*.com");
+        neocmd_append(cmd, "rm -f " BIN "*.o " BIN "*.com " BIN "*.asm ");
         neocmd_run_sync(cmd, NULL, NULL, false);
         neocmd_delete(cmd);
         return EXIT_SUCCESS;
     }
 
+    if (argc > 1 && !strcmp(argv[1], "push"))
+    {
+        if (argc < 3)
+        {
+            printf("Usage: %s push \"commit message\"\n", argv[0]);
+            return EXIT_FAILURE;
+        }
+
+        snprintf(buf, MAX_BUFLEN - 1, "git commit -m \"%s\" &&", argv[2]);
+        buf[MAX_BUFLEN - 1] = 0;
+
+        cmd = neocmd_create(BASH);
+        neocmd_append(cmd, "./neo clean");
+        neocmd_run_sync(cmd, NULL, NULL, false);
+
+        tmp = neocmd_create(BASH);
+        neocmd_append(tmp, "git add . &&");
+        neocmd_append(tmp, buf);
+        neocmd_append(tmp, "git push -u origin main");
+
+        neocmd_run_sync(tmp, NULL, NULL, false);
+        neocmd_delete(cmd);
+        neocmd_delete(tmp);
+        return EXIT_FAILURE;
+    }
+
     neo_compile_to_object_file(GCC, SRC "gritty.c", BIN "gritty.o", CFLAGS, false);
+    neo_compile_to_object_file(GCC, SRC "shapes.c", BIN "shapes.o", CFLAGS, false);
 
     cmd = neocmd_create(BASH);
 
@@ -48,11 +78,7 @@ int main(int argc, char **argv)
     neocmd_run_sync(cmd, NULL, NULL, false);
 
     // link xgfx.o with gritty.o
-    neo_link(LD, BIN "gritty.com", LFLAGS, false, BIN "gritty.o", BIN "xgfx.o");
-
-    as = neocmd_create(BASH);
-    neocmd_append(as, "gcc -S", SRC "gritty.c", "-o", BIN "gritty.asm", CFLAGS);
-    neocmd_run_sync(as, NULL, NULL, false);
+    neo_link(LD, BIN "gritty.com", LFLAGS, false, BIN "gritty.o", BIN "xgfx.o", BIN "shapes.o");
 
     if (argc > 1 && !strcmp(argv[1], "dis"))
     {

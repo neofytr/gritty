@@ -11,3 +11,5 @@ typedef struct packed
     uint16_t x, y;
     uint8_t color : 4; // our color pallette supports c0 to cfff (16 colors), so we need only 4 bits
 } point_t;
+
+void video_mode(uint8_t mode);

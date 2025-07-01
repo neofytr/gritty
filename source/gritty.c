@@ -4,8 +4,6 @@ __asm__(
 
 #include <gritty.h>
 #include <assembly.h>
-#include <shapes.h>
-#include <base.h>
 
 static void *curr_heap;
 static boolean alloc_init = false;
@@ -14,14 +12,6 @@ void putchar(uint8_t chr)
 {
     xputchar(chr);
     return;
-}
-
-void video_mode(uint8_t mode)
-{
-    if (mode > MAX_MODE)
-        return;
-
-    xvideo_mode(mode);
 }
 
 uint8_t getchar(void)
