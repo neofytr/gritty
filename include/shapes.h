@@ -18,5 +18,6 @@ typedef struct packed
 
 void video_mode(uint8_t mode);
 boolean draw_point(point_t *point);
+point_t *mk_point(uint16_t x, uint16_t y, uint8_t color);
 
 #endif

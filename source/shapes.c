@@ -1,5 +1,6 @@
 #include <shapes.h>
 #include <assembly.h>
+#include <gritty.h>
 
 static uint16_t max_x, max_y;
 static boolean is_mode_set = false;
@@ -24,6 +25,19 @@ void video_mode(uint8_t mode)
     }
     }
     return;
+}
+
+point_t *mk_point(uint16_t x, uint16_t y, uint8_t color)
+{
+    point_t *point = alloc(sizeof(point_t));
+    if (!point)
+        return NULL;
+
+    point->x = x;
+    point->y = y;
+    point->color = color;
+
+    return point;
 }
 
 boolean draw_point(point_t *point)
