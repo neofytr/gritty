@@ -37,8 +37,8 @@ exit:
 
     ; all stack pushes are 16-bit regardless
 
-    ; arg (high order byte)
-    ; arg (low order byte)
+    ; arg_byte (high order byte)
+    ; arg_byte (low order byte)
     ; return address (high order byte)
     ; return address (low order byte)
     ; prev base ptr (high order byte)
@@ -65,11 +65,11 @@ xputchar:
     push ebp
     mov  ebp, esp
 
-    arg al, 0
-    mov ah, 0x0E
-    xor bh, bh
-    xor bl, bl
-    int 0x10
+    arg_byte al, 0
+    mov      ah, 0x0E
+    xor      bh, bh
+    xor      bl, bl
+    int      0x10
 
     mov esp, ebp
     pop ebp
@@ -92,22 +92,36 @@ xvideo_mode:
     push ebp
     mov  ebp, esp
 
-    arg al, 0  ; put the mode argument into al 
-    xor ah, ah
-    int 0x10
+    arg_byte al, 0  ; put the mode arg_byteument into al 
+    xor      ah, ah
+    int      0x10
 
     mov esp, ebp
     pop ebp
     ret
 
-    ; y 
-    ; x
+    ; y (row)
+    ; x (column)
 
 xdraw_point_bwt:
     push ebp
     mov  ebp, esp
 
-    
+    ; change cursor position (int 0x10, 0x02)
+    arg_byte dl, 0
+    arg_byte dh, 1
+    xor      bh, bh
+    mov      ah, 0x02
+    int      0x10
+
+    ; write character at current cursor position (int 0x10, 0x0a)
+    mov ah, 0x0a
+    mov al, '+'
+    xor bh, bh
+    xor bl, bl   ; no need in text mode (only needed in graphics mode)
+    mov cx, 0x01
+
+    mov eax, 0x01 ; true return value
 
     mov esp, ebp
     pop ebp

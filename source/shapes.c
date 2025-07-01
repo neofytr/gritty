@@ -42,7 +42,8 @@ boolean draw_point(point_t *point)
     {
     case BW_TEXT_MODE:
     {
-        ret = xdraw_point_bwt(point->x, point->y);
+        ret = xdraw_point_bwt(point->x, point->y); // even though each argument is two byte, to maintain stack alignment
+                                                   // , both will be pushed as 4 byte words
         break;
     }
     }
