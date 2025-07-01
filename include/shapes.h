@@ -24,10 +24,12 @@ typedef struct packed
     uint8_t color : 4;
 } line_t;
 
-void video_mode(uint8_t mode);
-boolean draw_point(point_t *point);
+void video_mode(uint8_t mode); // set the current video mode
+boolean draw_point(point_t *point); // draw a point on the screen
+boolean draw_line(line_t *line); // draw a line on the screen
+
+// shape constructors
 point_t *mk_point(uint16_t x, uint16_t y, uint8_t color);
 line_t *mk_line(point_t *one, point_t *two, uint16_t thickness, uint8_t color);
-boolean draw_line(line_t *line);
 
 #endif
