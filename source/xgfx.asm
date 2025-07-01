@@ -15,6 +15,7 @@ global xwrite
 global xputchar
 global xgetchar
 global xvideo_mode
+global xdraw_point_bwt
 
 exit:
     ; function prologue
@@ -94,6 +95,19 @@ xvideo_mode:
     arg al, 0  ; put the mode argument into al 
     xor ah, ah
     int 0x10
+
+    mov esp, ebp
+    pop ebp
+    ret
+
+    ; y 
+    ; x
+
+xdraw_point_bwt:
+    push ebp
+    mov  ebp, esp
+
+    
 
     mov esp, ebp
     pop ebp

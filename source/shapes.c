@@ -28,6 +28,7 @@ void video_mode(uint8_t mode)
 
 boolean draw_point(point_t *point)
 {
+    boolean ret = false;
     if (!point || !is_mode_set)
         return false;
 
@@ -36,4 +37,15 @@ boolean draw_point(point_t *point)
 
     if (!is_mode_set)
         return false;
+
+    switch (curr_mode)
+    {
+    case BW_TEXT_MODE:
+    {
+        ret = xdraw_point_bwt(point->x, point->y);
+        break;
+    }
+    }
+
+    return ret;
 }

@@ -6,6 +6,7 @@
 
 #define MAX_MODE 13
 
+// the color field does nothing in the black and white text mode
 typedef struct packed
 {
     uint16_t x, y;
