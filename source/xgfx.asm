@@ -8,14 +8,15 @@ bits   16
 ; will pop the return address from the stack and jump to it
 
 global exit
+global write
 
 exit:
     ; function prologue
     push bp     ; save the base ptr
     mov  bp, sp ; make the current stack ptr the current base ptr
 
-    xor ax, ax
-    int 0x21   ; exit the program (int 0x21 with ax = 0 returns the control back the OS (MS-DOS)
+    xor ah, ah
+    int 0x21   ; exit the program (int 0x21 with ah = 0 returns the control back the OS (MS-DOS)
 
 .halt:
     cli
@@ -26,3 +27,15 @@ exit:
     mov sp, bp ; restore the stack ptr
     pop bp     ; restore the base ptr
     ret
+
+write:
+    push bp     ; save the base ptr
+    mov  bp, sp ; make the current stack ptr the current base ptr
+
+    mov dl, 0x41 ; moving character 'A' into DL
+    mov ah, 0x02 ; int 0x21 with ah = 0x02 prints the character in dl
+    int 0x21
+
+    mov sp, bp
+    pop bp
+    ret 

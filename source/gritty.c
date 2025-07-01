@@ -4,7 +4,10 @@ __asm__(".code16gcc\n"
 
 #include <gritty.h>
 
+extern void write(void);
+
 void main()
 {
+    write();
     return;
 }
