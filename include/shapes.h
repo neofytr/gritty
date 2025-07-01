@@ -1,3 +1,6 @@
+#ifndef SHAPES_H
+#define SHAPES_H
+
 #include <base.h>
 
 #define BW_TEXT_MODE 0
@@ -14,3 +17,6 @@ typedef struct packed
 } point_t;
 
 void video_mode(uint8_t mode);
+boolean draw_point(point_t *point);
+
+#endif

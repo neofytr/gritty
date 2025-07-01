@@ -107,6 +107,10 @@ xdraw_point_bwt:
     push ebp
     mov  ebp, esp
 
+    push ebx
+    push esi
+    push edi
+
     ; change cursor position (int 0x10, 0x02)
     arg_byte dl, 0
     arg_byte dh, 1
@@ -118,10 +122,15 @@ xdraw_point_bwt:
     mov ah, 0x0a
     mov al, '+'
     xor bh, bh
-    xor bl, bl   ; no need in text mode (only needed in graphics mode)
+    xor bl, bl   ; ignored in text mode (only needed in graphics mode)
     mov cx, 0x01
+    int 0x10
 
     mov eax, 0x01 ; true return value
+
+    pop edi
+    pop esi
+    pop ebx
 
     mov esp, ebp
     pop ebp

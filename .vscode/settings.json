@@ -55,6 +55,7 @@
         "stdio.h": "c",
         "gritty.h": "c",
         "shapes.h": "c",
-        "base.h": "c"
+        "base.h": "c",
+        "assembly.h": "c"
     }
 }

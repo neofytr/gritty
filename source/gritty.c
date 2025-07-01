@@ -4,6 +4,7 @@ __asm__(
 
 #include <gritty.h>
 #include <assembly.h>
+#include <shapes.h>
 
 static void *curr_heap;
 static boolean alloc_init = false;
@@ -64,8 +65,10 @@ void freeall(void)
 void main()
 {
     char c;
+    point_t point = {.x = 10, .y = 20, .color = 0};
 
     video_mode(BW_TEXT_MODE);
-    c = getchar();
+    draw_point(&point);
+
     return;
 }
