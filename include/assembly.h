@@ -4,5 +4,6 @@
 #include <stdint.h>
 
 void xputchar(uint8_t chr);
+void xwrite(uint8_t chr);
 
 #endif

@@ -1,1 +1,73 @@
 bits 16
+
+bits 16
+
+; we follow the standard abi for 32-bit gcc (system v i386 abi)
+; -------------------------------------------------------------
+; this abi defines how functions receive parameters, return values,
+; manage the stack, and preserve registers.
+;
+; stack layout and calling convention:
+; ------------------------------------
+; - arguments are pushed right to left on the stack by the caller.
+; - the caller also pushes the return address (via the 'call' instruction).
+; - all arguments are passed on the stack (not in registers).
+; - return values are placed in:
+;       - eax        -> for integers and pointers
+;       - edx:eax    -> for 64-bit integers (low in eax, high in edx)
+;       - st(0)      -> for floating point values (via x87 fpu)
+; - the caller is responsible for cleaning up the stack after the call.
+;
+; stack alignment:
+; ----------------
+; - the stack pointer (esp) must always be aligned to 4 bytes.
+; - each argument takes up at least 4 bytes on the stack.
+; - even small types like 'char' or 'short' are padded to 4 bytes.
+; - double and long long values may use two 4-byte slots (8 bytes total).
+;
+; register usage:
+; ---------------
+; - caller-saved (volatile): must be saved by the caller if needed
+;       - eax, ecx, edx
+; - callee-saved (non-volatile): must be preserved by the callee
+;       - ebx, esi, edi, ebp
+; - esp is always used as the stack pointer and must be preserved.
+;
+; structure return values:
+; ------------------------
+; - small structs (<= 4 or 8 bytes) may be returned in eax or edx:eax.
+; - large structs are returned via hidden pointer passed by the caller.
+;   gcc handles this transparently.
+;
+; object format and data model:
+; -----------------------------
+; - object file format: elf (on linux)
+; - data model: lp32 (32-bit long and pointer)
+;       - int       : 4 bytes
+;       - long      : 4 bytes
+;       - pointer   : 4 bytes
+;       - long long : 8 bytes
+;       - float     : 4 bytes
+;       - double    : 8 bytes
+; - alignment is usually equal to type size, up to 4 bytes max.
+;
+; note:
+; -----
+; this abi is used when compiling with gcc using -m32 on linux,
+; and it's the default for 32-bit linux binaries.
+;
+; when using nasm in 16-bit real mode but intending to link or interoperate
+; with 32-bit gcc output, follow this abi carefully when setting up the stack
+; and registers for function calls or implementing functions callable from C.
+
+; second argument (4 bytes)
+; first argument (4 bytes)
+; return address (4 bytes)
+; prev base ptr (4 bytes) <- esp, ebp (just after the function prologue)
+
+; use this macro to access arguments passed to the function
+; arg <dest reg>, <arg num>
+%macro arg 2 
+    %%offset equ ((4 * %2) + 8)
+    mov %1, [ebp + %%offset]
+%endmacro

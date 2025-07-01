@@ -11,7 +11,8 @@ bits   16
 ; we need to follow this ABI in the functions that are called from the C code
 
 global exit
-global xputchar
+global xwrite
+global xputchr
 
 exit:
     ; function prologue
@@ -45,7 +46,7 @@ exit:
     ; 0x33
     ; 
 
-xputchar:
+xwrite:
     push ebp      ; save the base ptr
     mov  ebp, esp ; make the current stack ptr the current base ptr
 
@@ -56,3 +57,7 @@ xputchar:
     mov esp, ebp
     pop ebp
     ret 
+
+xputchar:
+    push ebp 
+    mov ebp, esp 
