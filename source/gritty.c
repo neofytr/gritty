@@ -15,6 +15,24 @@ void putchar(uint8_t chr)
     return;
 }
 
+uint8_t getchar(void)
+{
+    uint8_t al, ah;
+    uint16_t ax;
+    uint8_t ret;
+
+    ax = (uint16_t)xgetchar();
+    al = (uint8_t)(ax & 0x00ff);
+    ah = (uint8_t)(ax & 0xff00) >> 8;
+
+    if (al)
+        ret = al;
+    else
+        ret = ah;
+
+    return ret;
+}
+
 void print(uint8_t *str)
 {
     if (!str)

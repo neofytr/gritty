@@ -13,6 +13,7 @@ bits   16
 global exit
 global xwrite
 global xputchar
+global xgetchar
 global xvideo_mode
 
 exit:
@@ -68,6 +69,19 @@ xputchar:
     xor bh, bh
     xor bl, bl
     int 0x10
+
+    mov esp, ebp
+    pop ebp
+    ret
+
+xgetchar:
+    push ebp
+    mov  ebp, esp
+
+    xor ah, ah
+    int 0x10
+
+    ; the return value is already in ax
 
     mov esp, ebp
     pop ebp
