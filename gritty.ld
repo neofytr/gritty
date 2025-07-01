@@ -24,6 +24,14 @@ SECTIONS
 		                      this is usually not written into the binary unless explicitly placed */
 	}
 
-	heap = ALIGN(2);        /* define a symbol 'heap' at the next 2-byte aligned address,
+	__heap = ALIGN(2);        /* define a symbol '__heap' at the next 2-byte aligned address,
 	                           useful to mark where heap memory can begin at runtime */
+
+	/* a symbol is a label for a memory address */
+	/* C interprets a symbol in the way it's declared */
+	/* extern char __heap */
+	/* Now, heap contains the byte at the memory the symbol pointed to (automatic dereferencing of symbols according to their declaration) */
+	/* to get the intended address, use &__heap */
+	/* the memory address that the symbol __heap points to can be accessed as &__heap inside C code
+	and as __heap inside assembly code */
 }

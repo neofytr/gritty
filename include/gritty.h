@@ -10,7 +10,7 @@
 
 typedef uint8_t bool;
 
-extern uint8_t *heap; // symbol exported by the linker script
+extern uint8_t __heap; // symbol exported by the linker script
 
 void print(uint8_t *str);
 void putchar(uint8_t chr);

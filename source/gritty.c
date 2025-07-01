@@ -5,8 +5,8 @@ __asm__(
 #include <gritty.h>
 #include <assembly.h>
 
-static uint8_t *currheap;
-static bool allocinit = false;
+static void *curr_heap;
+static bool alloc_init = false;
 
 void putchar(uint8_t chr)
 {
@@ -27,28 +27,43 @@ void print(uint8_t *str)
 
 void *alloc(uint16_t size)
 {
-    uint8_t *ptr;
-    if (!allocinit)
+    void *ptr;
+    if (!alloc_init)
     {
-        allocinit = true;
-        currheap = heap;
+        alloc_init = true;
+        curr_heap = &__heap;
     }
 
     if (!size)
         return NULL;
 
-    ptr = currheap;
-    currheap += (size);
+    ptr = curr_heap;
+    curr_heap = (uint8_t *)curr_heap + size;
     return ptr;
 }
 
 void freeall(void)
 {
-    currheap = heap;
+    curr_heap = &__heap;
     return;
 }
 void main()
 {
-    print((uint8_t *)"hello world");
+    uint8_t *ptr;
+
+    ptr = alloc(5);
+    if (!ptr)
+    {
+        print((uint8_t *)"alloc error");
+        return;
+    }
+
+    ptr[0] = 'a';
+    ptr[1] = 'b';
+    ptr[2] = 'c';
+    ptr[3] = 'd';
+    ptr[4] = 0; // null byte
+
+    print(ptr);
     return;
 }
