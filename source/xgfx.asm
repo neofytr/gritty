@@ -12,7 +12,7 @@ bits   16
 
 global exit
 global xwrite
-global xputchr
+global xputchar
 
 exit:
     ; function prologue
@@ -59,5 +59,15 @@ xwrite:
     ret 
 
 xputchar:
-    push ebp 
-    mov ebp, esp 
+    push ebp
+    mov  ebp, esp
+
+    arg al, 0
+    mov ah, 0x0E
+    xor bh, bh
+    xor bl, bl
+    int 0x10
+
+    mov esp, ebp
+    pop ebp
+    ret

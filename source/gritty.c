@@ -24,5 +24,6 @@ void print(uint8_t *str)
 }
 void main()
 {
+    print((uint8_t *)"hello world");
     return;
 }
