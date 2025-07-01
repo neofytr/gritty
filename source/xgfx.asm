@@ -79,7 +79,7 @@ xgetchar:
     mov  ebp, esp
 
     xor ah, ah
-    int 0x10
+    int 0x16
 
     ; the return value is already in ax
 

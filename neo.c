@@ -6,12 +6,12 @@
 #define INC "include/"
 #define ASMINC INC "asm/"
 
-#define CFLAGS "-O0 -Wall -Wextra -Wpedantic -Werror " /* optimize the code moderately (level 2) */                     \
-               "-std=c99 "                             /* use the c99 language standard */                              \
-               "-m16 -march=i386 "                     /* generate 16-bit code; target the i386 architecture */         \
-               "-fno-stack-protector "                 /* disable stack smashing protection */                          \
-               "-ffreestanding "                       /* compile without assuming standard library or startup files */ \
-               "-fno-pic -fno-pie "                                                                                     \
+#define CFLAGS "-O0 -Wall -Wextra -Wpedantic " /* optimize the code moderately (level 2) */                     \
+               "-std=c99 "                     /* use the c99 language standard */                              \
+               "-m16 -march=i386 "             /* generate 16-bit code; target the i386 architecture */         \
+               "-fno-stack-protector "         /* disable stack smashing protection */                          \
+               "-ffreestanding "               /* compile without assuming standard library or startup files */ \
+               "-fno-pic -fno-pie -nostdlib "                                                                   \
                "-I " INC /* add the directory in INC as an include path */
 
 #define LFLAGS "-nmagic --script=gritty.ld -m elf_i386" // x86-64 output is default; so we change it to elf_i386

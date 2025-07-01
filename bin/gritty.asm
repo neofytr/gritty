@@ -36,10 +36,74 @@ putchar:
 	.cfi_endproc
 .LFE0:
 	.size	putchar, .-putchar
+	.globl	video_mode
+	.type	video_mode, @function
+video_mode:
+.LFB1:
+	.cfi_startproc
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	subl	$24, %esp
+	movl	8(%ebp), %eax
+	movb	%al, -12(%ebp)
+	cmpb	$13, -12(%ebp)
+	ja	.L6
+	movzbl	-12(%ebp), %eax
+	subl	$12, %esp
+	pushl	%eax
+	call	xvideo_mode
+	addl	$16, %esp
+	jmp	.L3
+.L6:
+	nop
+.L3:
+	leave
+	.cfi_restore 5
+	.cfi_def_cfa 4, 4
+	ret
+	.cfi_endproc
+.LFE1:
+	.size	video_mode, .-video_mode
+	.globl	getchar
+	.type	getchar, @function
+getchar:
+.LFB2:
+	.cfi_startproc
+	pushl	%ebp
+	.cfi_def_cfa_offset 8
+	.cfi_offset 5, -8
+	movl	%esp, %ebp
+	.cfi_def_cfa_register 5
+	subl	$24, %esp
+	call	xgetchar
+	movzbl	%al, %eax
+	movw	%ax, -10(%ebp)
+	movw	-10(%ebp), %ax
+	movb	%al, -11(%ebp)
+	movb	$0, -12(%ebp)
+	cmpb	$0, -11(%ebp)
+	je	.L8
+	movb	-11(%ebp), %al
+	jmp	.L9
+.L8:
+	movb	-12(%ebp), %al
+.L9:
+	movb	%al, -13(%ebp)
+	movb	-13(%ebp), %al
+	leave
+	.cfi_restore 5
+	.cfi_def_cfa 4, 4
+	ret
+	.cfi_endproc
+.LFE2:
+	.size	getchar, .-getchar
 	.globl	print
 	.type	print, @function
 print:
-.LFB1:
+.LFB3:
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -48,9 +112,9 @@ print:
 	.cfi_def_cfa_register 5
 	subl	$8, %esp
 	cmpl	$0, 8(%ebp)
-	je	.L8
-	jmp	.L6
-.L7:
+	je	.L16
+	jmp	.L14
+.L15:
 	movl	8(%ebp), %eax
 	leal	1(%eax), %edx
 	movl	%edx, 8(%ebp)
@@ -60,26 +124,26 @@ print:
 	pushl	%eax
 	call	putchar
 	addl	$16, %esp
-.L6:
+.L14:
 	movl	8(%ebp), %eax
 	movb	(%eax), %al
 	testb	%al, %al
-	jne	.L7
-	jmp	.L3
-.L8:
+	jne	.L15
+	jmp	.L11
+.L16:
 	nop
-.L3:
+.L11:
 	leave
 	.cfi_restore 5
 	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
-.LFE1:
+.LFE3:
 	.size	print, .-print
 	.globl	alloc
 	.type	alloc, @function
 alloc:
-.LFB2:
+.LFB4:
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -91,15 +155,15 @@ alloc:
 	movw	%ax, -20(%ebp)
 	movb	alloc_init, %al
 	testb	%al, %al
-	jne	.L10
+	jne	.L18
 	movb	$1, alloc_init
 	movl	$__heap, curr_heap
-.L10:
+.L18:
 	cmpw	$0, -20(%ebp)
-	jne	.L11
+	jne	.L19
 	movl	$0, %eax
-	jmp	.L12
-.L11:
+	jmp	.L20
+.L19:
 	movl	curr_heap, %eax
 	movl	%eax, -4(%ebp)
 	movl	curr_heap, %edx
@@ -107,18 +171,18 @@ alloc:
 	addl	%edx, %eax
 	movl	%eax, curr_heap
 	movl	-4(%ebp), %eax
-.L12:
+.L20:
 	leave
 	.cfi_restore 5
 	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
-.LFE2:
+.LFE4:
 	.size	alloc, .-alloc
 	.globl	freeall
 	.type	freeall, @function
 freeall:
-.LFB3:
+.LFB5:
 	.cfi_startproc
 	pushl	%ebp
 	.cfi_def_cfa_offset 8
@@ -132,16 +196,12 @@ freeall:
 	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
-.LFE3:
+.LFE5:
 	.size	freeall, .-freeall
-	.section	.rodata
-.LC0:
-	.string	"alloc error"
-	.text
 	.globl	main
 	.type	main, @function
 main:
-.LFB4:
+.LFB6:
 	.cfi_startproc
 	leal	4(%esp), %ecx
 	.cfi_def_cfa 1, 0
@@ -153,38 +213,13 @@ main:
 	pushl	%ecx
 	.cfi_escape 0xf,0x3,0x75,0x7c,0x6
 	subl	$20, %esp
-	pushl	$5
-	call	alloc
-	addl	$4, %esp
-	movl	%eax, -12(%ebp)
-	cmpl	$0, -12(%ebp)
-	jne	.L16
 	subl	$12, %esp
-	pushl	$.LC0
-	call	print
+	pushl	$0
+	call	video_mode
 	addl	$16, %esp
-	jmp	.L15
-.L16:
-	movl	-12(%ebp), %eax
-	movb	$97, (%eax)
-	movl	-12(%ebp), %eax
-	incl	%eax
-	movb	$98, (%eax)
-	movl	-12(%ebp), %eax
-	addl	$2, %eax
-	movb	$99, (%eax)
-	movl	-12(%ebp), %eax
-	addl	$3, %eax
-	movb	$100, (%eax)
-	movl	-12(%ebp), %eax
-	addl	$4, %eax
-	movb	$0, (%eax)
-	subl	$12, %esp
-	pushl	-12(%ebp)
-	call	print
-	addl	$16, %esp
+	call	getchar
+	movb	%al, -9(%ebp)
 	nop
-.L15:
 	movl	-4(%ebp), %ecx
 	.cfi_def_cfa 1, 0
 	leave
@@ -193,7 +228,7 @@ main:
 	.cfi_def_cfa 4, 4
 	ret
 	.cfi_endproc
-.LFE4:
+.LFE6:
 	.size	main, .-main
 	.ident	"GCC: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0"
 	.section	.note.GNU-stack,"",@progbits

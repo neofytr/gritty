@@ -4,6 +4,7 @@ __asm__(
 
 #include <gritty.h>
 #include <assembly.h>
+#include <shapes.h>
 #include <base.h>
 
 static void *curr_heap;
@@ -13,6 +14,14 @@ void putchar(uint8_t chr)
 {
     xputchar(chr);
     return;
+}
+
+void video_mode(uint8_t mode)
+{
+    if (mode > MAX_MODE)
+        return;
+
+    xvideo_mode(mode);
 }
 
 uint8_t getchar(void)
@@ -25,11 +34,7 @@ uint8_t getchar(void)
     al = (uint8_t)(ax & 0x00ff);
     ah = (uint8_t)(ax & 0xff00) >> 8;
 
-    if (al)
-        ret = al;
-    else
-        ret = ah;
-
+    ret = (al) ? al : ah;
     return ret;
 }
 
@@ -68,21 +73,9 @@ void freeall(void)
 }
 void main()
 {
-    uint8_t *ptr;
+    char c;
 
-    ptr = alloc(5);
-    if (!ptr)
-    {
-        print((uint8_t *)"alloc error");
-        return;
-    }
-
-    ptr[0] = 'a';
-    ptr[1] = 'b';
-    ptr[2] = 'c';
-    ptr[3] = 'd';
-    ptr[4] = 0; // null byte
-
-    print(ptr);
+    video_mode(BW_TEXT_MODE);
+    c = getchar();
     return;
 }
