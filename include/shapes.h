@@ -3,15 +3,21 @@
 
 #include <base.h>
 
-#define BW_TEXT_MODE 0
-#define BW_TEXT_MAX_X 40
-#define BW_TEXT_MAX_Y 25
+#define BWT_MODE 0
+#define BWT_MAX_X 40
+#define BWT_MAX_Y 25
 
-#define BW_GRAPHICS_MODE 0x06
-#define BW_GRAPHICS_MAX_X 640
-#define BW_GRAPHICS_MAX_Y 200
+// 16 colors supported (from 0 to 15)
+#define SCG_MODE 0x12
+#define SCG_MAX_X 640
+#define SCG_MAX_Y 480
 
-#define MAX_MODE 13
+// black and white graphics mode
+#define BWG_MODE 0x06
+#define BWG_MAX_X 640
+#define BWG_MAX_Y 200
+
+#define MAX_MODE 0x13
 
 // the color field does nothing in the black and white text mode
 typedef struct packed

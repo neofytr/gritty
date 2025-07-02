@@ -15,6 +15,7 @@ global xwrite
 global xputchar
 global xgetchar
 global xvideo_mode
+global xdraw_point_scg
 global xdraw_point_bwt
 global xdraw_point_bwg
 
@@ -93,7 +94,7 @@ xvideo_mode:
     push ebp
     mov  ebp, esp
 
-    arg_byte al, 0  ; put the mode arg_byteument into al 
+    arg_byte al, 0  ; put the mode into al 
     xor      ah, ah
     int      0x10
 
@@ -129,16 +130,16 @@ xdraw_point_bwt:
     pop ebp
     ret
 
-xdraw_point_bwg:
+xdraw_point_scg:
     push ebp
     mov  ebp, esp
 
     arg_word cx, 0
     arg_word dx, 1
+    arg_byte al, 2 ; 16 colors supported (from 0 to 15)
 
     ; write graphics pixel at coordinate (int 0x10, 0xc)
     mov ah, 0x0c
-    xor al, al   ; color value is ignored for BW_graphics
     xor bh, bh   ; page number 0
     int 0x10
 
@@ -148,3 +149,21 @@ xdraw_point_bwg:
     pop ebp
     ret
 
+xdraw_point_bwg:
+    push ebp
+    mov  ebp, esp
+
+    arg_word cx, 0
+    arg_word dx, 1
+
+    ; write graphics pixel at coordinate (int 0x10, 0xc)
+    mov ah, 0x0c
+    xor al, al  ; color doesn't matter in BW Graphics mode
+    xor bh, bh   ; page number 0
+    int 0x10
+
+    mov eax, 0x01
+
+    mov esp, ebp
+    pop ebp
+    ret

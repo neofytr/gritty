@@ -12,21 +12,27 @@ void video_mode(uint8_t mode)
     if (mode > MAX_MODE)
         return;
 
+    switch (mode)
+    {
+    case BWT_MODE:
+        max_x = BWT_MAX_X;
+        max_y = BWT_MAX_Y;
+        break;
+    case SCG_MODE:
+        max_x = SCG_MAX_X;
+        max_y = SCG_MAX_Y;
+        break;
+    case BWG_MODE:
+        max_x = BWG_MAX_X;
+        max_y = BWG_MAX_Y;
+        break;
+    default:
+        return;
+    }
+
     xvideo_mode(mode);
     is_mode_set = true;
     curr_mode = mode;
-
-    switch (mode)
-    {
-    case BW_TEXT_MODE:
-        max_x = BW_TEXT_MAX_X;
-        max_y = BW_TEXT_MAX_Y;
-        break;
-    case BW_GRAPHICS_MODE:
-        max_x = BW_GRAPHICS_MAX_X;
-        max_y = BW_GRAPHICS_MAX_Y;
-        break;
-    }
 
     return;
 }
@@ -54,10 +60,14 @@ boolean draw_point(point_t *point)
 
     switch (curr_mode)
     {
-    case BW_TEXT_MODE:
-        return xdraw_point_bwt(point->x, point->y);
-    case BW_GRAPHICS_MODE:
+    case BWG_MODE:
         return xdraw_point_bwg(point->x, point->y);
+    case BWT_MODE:
+        return xdraw_point_bwt(point->x, point->y);
+    case SCG_MODE:
+        if (point->color >= 16)
+            return false;
+        return xdraw_point_scg(point->x, point->y, point->color);
     }
 
     return false;
