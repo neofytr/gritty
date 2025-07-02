@@ -22,10 +22,6 @@ void video_mode(uint8_t mode)
         max_x = SCG_MAX_X;
         max_y = SCG_MAX_Y;
         break;
-    case BWG_MODE:
-        max_x = BWG_MAX_X;
-        max_y = BWG_MAX_Y;
-        break;
     default:
         return;
     }
@@ -60,8 +56,6 @@ boolean draw_point(point_t *point)
 
     switch (curr_mode)
     {
-    case BWG_MODE:
-        return xdraw_point_bwg(point->x, point->y);
     case BWT_MODE:
         return xdraw_point_bwt(point->x, point->y);
     case SCG_MODE:

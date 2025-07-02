@@ -12,11 +12,6 @@
 #define SCG_MAX_X 640
 #define SCG_MAX_Y 480
 
-// black and white graphics mode
-#define BWG_MODE 0x06
-#define BWG_MAX_X 640
-#define BWG_MAX_Y 200
-
 #define MAX_MODE 0x13
 
 // the color field does nothing in the black and white text mode

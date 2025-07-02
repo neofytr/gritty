@@ -64,24 +64,6 @@ void freeall(void)
 }
 void main()
 {
-    point_t *one, *three;
-    rectangle_t *rect;
-    video_mode(BWG_MODE);
-
-    one = mk_point(100, 100, 10);
-    three = mk_point(200, 200, 10);
-
-    rect = mk_rect(one, three, 5, 10, 10, false);
-    draw_rect(rect);
-
-    xdraw_point_bwg(100, 100);
-    xdraw_point_bwg(101, 101);
-    xdraw_point_bwg(102, 102);
-    xdraw_point_bwg(103, 103);
-    xdraw_point_bwg(104, 104);
-    xdraw_point_bwg(105, 105);
-    xdraw_point_bwg(106, 106);
-    xdraw_point_bwg(107, 107);
-
+    video_mode(BWT_MODE);
     return;
 }
