@@ -71,3 +71,8 @@ bits 16
     %%offset equ ((4 * %2) + 8)
     mov %1, BYTE [ebp + %%offset]
 %endmacro
+
+%macro arg_word 2 
+    %%offset equ ((4 * %2) + 8)
+    mov %1, WORD [ebp + %%offset]
+%endmacro

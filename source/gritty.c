@@ -65,14 +65,12 @@ void freeall(void)
 void main()
 {
     point_t *one, *three;
-    rectangle_t *rect;
 
     one = mk_point(10, 10, 0);
     three = mk_point(25, 20, 0);
-    rect = mk_rect(one, three, 4, 0, 0, false);
 
-    video_mode(BW_TEXT_MODE);
-    draw_rect(rect);
+    video_mode(BW_GRAPHICS_MODE);
+    draw_line(mk_line(one, three, 1, 0));
 
     return;
 }

@@ -7,6 +7,10 @@
 #define BW_TEXT_MAX_X 40
 #define BW_TEXT_MAX_Y 25
 
+#define BW_GRAPHICS_MODE 0x06
+#define BW_GRAPHICS_MAX_X 640
+#define BW_GRAPHICS_MAX_Y 200
+
 #define MAX_MODE 13
 
 // the color field does nothing in the black and white text mode
