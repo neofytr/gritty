@@ -164,10 +164,18 @@ xget_more_err_info:
     mov  ebp, esp
     save
 
+    arg_word cx, 0 ; err
+    arg_word dx, 1 ; act
+
     ; get extended error information  (int 0x21, 0x59)
     mov ah, 0x59
     xor bx, bx
     int 0x21
+
+    ; AX contains the returned extended error code 
+    ; These can fit into a byte, so, we use the lower byte of AX
+    mov BYTE [cx], al
+    mov BYTE [dx], bl ; BL contains the suggested action
 
     restore
     mov esp, ebp
