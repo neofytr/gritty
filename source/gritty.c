@@ -12,35 +12,23 @@ __asm__(
 static void *curr_heap;
 static boolean alloc_init = false;
 
-void putchar(uint8_t chr)
+int16_t print(const char *str)
 {
-    xputchar(chr);
-    return;
-}
-
-uint8_t getchar(void)
-{
-    uint8_t al, ah;
-    uint16_t ax;
-    uint8_t ret;
-
-    ax = (uint16_t)xgetchar();
-    al = (uint8_t)(ax & 0x00ff);
-    ah = (uint8_t)(ax & 0xff00) >> 8;
-
-    ret = (al) ? al : ah;
-    return ret;
-}
-
-void print(const char *str)
-{
+    const uint8_t *ptr;
     if (!str)
-        return;
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
+        return -1;
+    }
 
-    while (*str)
-        putchar(*str++);
+    ptr = (uint8_t *)str;
+    uint16_t len = 0;
+    while (*ptr++)
+        len++;
 
-    return;
+    return writeFile(OUTPUT, len, (uint8_t *)str);
 }
 
 void *alloc(uint16_t size)
@@ -205,22 +193,6 @@ int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer)
 
 void main()
 {
-    int16_t ret;
-    uint8_t buf[32];
-
-    video_mode(BWT_MODE);
-    ret = openFile("C:\\HELLO.BIN", READ_ONLY, EVERYONE_FULL_ACCESS, INHERITABLE);
-    if (ret < 0)
-    {
-        print("Error opening file\n");
-        return;
-    }
-
-    ret = readFile(ret, 32, buf);
-    if (ret < 0)
-        print("Error reading file\n");
-
-    print((const char *)buf);
-
+    print("hello");
     return;
 }

@@ -19,15 +19,17 @@ typedef int16_t fileHandle_t;
 #define DENY_OTHERS_READ ((uint8_t)0x0C)
 #define EVERYONE_FULL_ACCESS ((uint8_t)0x10)
 
+#define INPUT ((fileHandle_t)0)
+#define OUTPUT ((fileHandle_t)1)
+#define ERROR ((fileHandle_t)2)
+
 // Inheritance flag (bit 4)
 #define INHERITABLE ((uint8_t)0x00)
 #define PRIVATE ((uint8_t)0x20)
 
 extern uint8_t __heap; // symbol exported by the linker script
 
-void print(const char *str);
-void putchar(uint8_t chr);
-uint8_t getchar(void);
+int16_t print(const char *str);
 void *alloc(uint16_t size);
 void freeall(void);
 fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingMode, uint8_t inheritenceMode); // returns the error code in errnum and -1 on error
@@ -38,5 +40,8 @@ boolean closeFile(fileHandle_t fileHandle);                                     
 // if the returned value is 0, no data was read, and EOF occurred before read
 int16_t readFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
 
+// returns the number of bytes written on success, -1 on error
+// if the returned value is < bytes, then a partial write occurred
+// this function can be used to truncate a file to the current file position by writing zero bytes
 int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
 #endif

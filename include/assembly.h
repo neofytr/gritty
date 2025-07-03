@@ -6,10 +6,7 @@
 // all these functions return negative of the error code upon error
 // 0 upon success
 
-void xputchar(uint8_t chr);
-void xwrite(uint8_t chr);
 void xvideo_mode(uint8_t mode);
-uint8_t xgetchar(void);
 uint8_t xdraw_point_bwt(uint16_t x, uint16_t y);
 uint8_t xdraw_point_scg(uint16_t x, uint16_t y, uint8_t color);
 uint16_t xget_more_err_info(uint16_t *err, uint16_t *act);

@@ -11,9 +11,6 @@ bits   16
 ; we need to follow this ABI in the functions that are called from the C code
 
 global exit
-global xwrite
-global xputchar
-global xgetchar
 global xvideo_mode
 global xdraw_point_scg
 global xdraw_point_bwt
@@ -54,52 +51,6 @@ exit:
     ; 0x00 
     ; 0x33
     ; 
-
-xwrite:
-    push ebp      ; save the base ptr
-    mov  ebp, esp ; make the current stack ptr the current base ptr 
-    save
-    
-    mov dl, BYTE [ebp + 8]
-    mov ah, 0x02           ; int 0x21 with ah = 0x02 prints the character in dl
-    int 0x21
-
-    restore
-    pop ebx
-    mov esp, ebp
-    pop ebp
-    ret 
-
-xputchar:
-    push ebp
-    mov  ebp, esp
-    save
-
-    arg_byte al, 0
-    mov      ah, 0x0E
-    xor      bh, bh
-    xor      bl, bl
-    int      0x10
-
-    restore
-    mov esp, ebp
-    pop ebp
-    ret
-
-xgetchar:
-    push ebp
-    mov  ebp, esp
-    save
-
-    xor ah, ah
-    int 0x16
-
-    ; the return value is already in ax
-
-    restore
-    mov esp, ebp
-    pop ebp
-    ret
 
 xvideo_mode: 
     push ebp
@@ -261,9 +212,22 @@ xwrite_file:
     mov  ebp, esp
     save 
 
+    ; write to file/device using handle  (int 0x21, 0x40)
+    mov      ah, 0x40
+    arg_word bx, 0    ; file handle
+    arg_word cx, 1    ; number of bytes to write (a zero value truncates/extends the file to the current file position)
+    arg_word dx, 2    ; ptr to buf 
+    int      0x21
 
+    jnc .write_file_leave
+    ; error 
+    neg ax                ; return negated error code
+
+.write_file_leave:
+    ; if AX != CX, a partial write occured
     restore 
     mov esp, ebp
+    pop ebp
     ret
 
 
