@@ -23,7 +23,6 @@ typedef int16_t fileHandle_t;
 #define OUTPUT ((fileHandle_t)1)
 #define ERROR ((fileHandle_t)2)
 
-// Inheritance flag (bit 4)
 #define INHERITABLE ((uint8_t)0x00)
 #define PRIVATE ((uint8_t)0x20)
 
@@ -51,4 +50,6 @@ int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
 // if max_len is 1, buf[0] will be the null-byte
 int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, ...);
 
+// prints a formatted string to stdout
+int16_t printFormatted(const char *format, ...);
 #endif

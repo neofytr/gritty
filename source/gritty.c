@@ -116,7 +116,22 @@ int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *forma
     }
 
     buf[bufIndex++] = '\0';
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
     return bufIndex;
+}
+
+int16_t printFormatted(const char *format, ...)
+{
+    uint8_t buf[PRINTF_BUF_LEN];
+    int16_t len;
+    va_list args;
+
+    va_start(args, format);
+    // this function call won't fail (there is no way to fail)
+    len = printFormattedToBuffer(buf, PRINTF_BUF_LEN, format, args);
+    return writeFile(OUTPUT, (uint16_t)len, buf);
 }
 
 void *alloc(uint16_t size)
