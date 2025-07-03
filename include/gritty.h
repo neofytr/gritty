@@ -32,5 +32,6 @@ void *alloc(uint16_t size);
 void freeall(void);
 fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingMode, uint8_t inheritenceMode); // returns the error code in errnum and -1 on error
 boolean closeFile(fileHandle_t fileHandle);                                                                    // returns the error code in errnum and -1 on error
-
+int16_t readFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
+int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
 #endif

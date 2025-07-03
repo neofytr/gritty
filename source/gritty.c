@@ -131,6 +131,76 @@ boolean closeFile(fileHandle_t file)
     return true;
 }
 
+int16_t readFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer)
+{
+    int16_t ret;
+    uint16_t err, act;
+    if (!buffer)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
+        return -1;
+    }
+
+    ret = xread_file(fileHandle, bytes, buffer);
+    if (ret < 0)
+    {
+        if (RETURN_EXTENDED_ERRORS || RETURN_ACTION)
+        {
+            xget_more_err_info(&err, &act);
+            if (RETURN_EXTENDED_ERRORS)
+                errnum = err;
+            if (RETURN_ACTION)
+                action = act;
+        }
+        else
+            errnum = -ret;
+
+        return -1;
+    }
+
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
+    return ret;
+}
+
+int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer)
+{
+    int16_t ret;
+    uint16_t err, act;
+    if (!buffer)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
+        return -1;
+    }
+
+    ret = xwrite_file(fileHandle, bytes, buffer);
+    if (ret < 0)
+    {
+        if (RETURN_EXTENDED_ERRORS || RETURN_ACTION)
+        {
+            xget_more_err_info(&err, &act);
+            if (RETURN_EXTENDED_ERRORS)
+                errnum = err;
+            if (RETURN_ACTION)
+                action = act;
+        }
+        else
+            errnum = -ret;
+
+        return -1;
+    }
+
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
+    return ret;
+}
+
 void main()
 {
     uint8_t ret;
