@@ -20,6 +20,8 @@ global xdraw_point_bwt
 global xget_more_err_info
 global xopen_file
 global xclose_file
+global xread_file
+global xwrite_file
 
 exit:
     ; function prologue
@@ -227,6 +229,33 @@ xclose_file:
     mov esp, ebp
     pop ebp
     ret
+
+xread_file:
+    push ebp
+    mov  ebp, esp
+    save 
+
+    ; read from file/device using file handle (int 0x21, 0x3f)
+    mov      ah, 0x3f
+    arg_word bx, 0    ; file handle 
+    arg_word cx, 1    ; number of bytes
+    arg_word dx, 2    ; buffer ptr
+    int      0x21
+
+    jnc .read_file_leave
+    ; error 
+    neg ax               ; return negative of the error code
+
+
+.read_file_leave:
+    ; if CF is not set, AX contains the number of bytes read 
+    ; if AX != CX, then a partial read occured due to end of file
+    ; if AX = 0, no data was read, and EOF occured before read 
+    restore 
+    mov esp, ebp
+    pop ebp
+    ret
+
 
 
     
