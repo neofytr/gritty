@@ -44,4 +44,11 @@ int16_t readFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
 // if the returned value is < bytes, then a partial write occurred
 // this function can be used to truncate a file to the current file position by writing zero bytes
 int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
+
+// returns the number of bytes written on success, -1 on error
+// this function can be used to print a formatted string to a buffer
+// this function is strict about the last null byte; it will always ensure that there is a null-byte at the end of the buffer
+// if max_len is 1, buf[0] will be the null-byte
+int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, ...);
+
 #endif

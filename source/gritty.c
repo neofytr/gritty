@@ -8,6 +8,9 @@ __asm__(
 #include <assembly.h>
 #include <shapes.h>
 #include <errnum.h>
+#include <stdarg.h>
+
+#define PRINTF_BUF_LEN (2048 + 1) // 1 for null-byte
 
 static void *curr_heap;
 static boolean alloc_init = false;
@@ -29,6 +32,91 @@ int16_t print(const char *str)
         len++;
 
     return writeFile(OUTPUT, len, (uint8_t *)str);
+}
+
+int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, ...)
+{
+    uint8_t numBuf[16] = {0};
+    uint16_t numIndex;
+    boolean isNeg;
+    int16_t num;
+    uint8_t *ptr;
+    uint16_t len;
+    uint16_t tmp;
+    uint16_t bufIndex, formatIndex;
+    va_list args;
+    if (!format)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
+        return -1;
+    }
+
+    va_start(args, format);
+
+    ptr = (uint8_t *)format;
+    len = 0;
+
+    while (*ptr++)
+        len++;
+
+    bufIndex = formatIndex = 0;
+    while (bufIndex < max_len - 1) // last byte is strictly for the null byte
+    {
+        if (formatIndex >= len)
+            break;
+
+        if (format[formatIndex] == '%')
+        {
+            if (formatIndex + 1 >= len)
+            {
+                buf[bufIndex++] = '%';
+                formatIndex++;
+                break;
+            }
+            else if (format[formatIndex + 1] == '%')
+            {
+                formatIndex += 2;
+                buf[bufIndex++] = '%';
+            }
+            else if (format[formatIndex + 1] == 'd')
+            {
+                formatIndex += 2;
+                num = va_arg(args, int16_t);
+
+                numIndex = 0;
+                isNeg = num < 0;
+                if (isNeg)
+                    num = -num;
+
+                while (num)
+                {
+                    numBuf[numIndex++] = num % 10 + '0';
+                    num /= 10;
+                }
+
+                if (isNeg)
+                    numBuf[numIndex++] = '-';
+
+                numBuf[numIndex++] = 0;
+                for (tmp = numIndex - 1; tmp >= 0; tmp--)
+                    buf[bufIndex++] = numBuf[tmp];
+            }
+            else
+            {
+                buf[bufIndex++] = format[formatIndex++];
+            }
+        }
+        else
+        {
+            formatIndex++;
+            bufIndex++;
+        }
+    }
+
+    buf[bufIndex++] = '\0';
+    return bufIndex;
 }
 
 void *alloc(uint16_t size)
