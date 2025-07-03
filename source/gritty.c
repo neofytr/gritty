@@ -1,3 +1,5 @@
+#define INSIDE_GRITTY
+
 __asm__(
     "call main\n"
     "call exit\n");
@@ -5,6 +7,7 @@ __asm__(
 #include <gritty.h>
 #include <assembly.h>
 #include <shapes.h>
+#include <errnum.h>
 
 static void *curr_heap;
 static boolean alloc_init = false;
@@ -62,6 +65,34 @@ void freeall(void)
     curr_heap = &__heap;
     return;
 }
+
+fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingMode, uint8_t inheritenceMode)
+{
+    uint8_t mode, reserved;
+    uint16_t extErr;
+    fileHandle_t file;
+    if (!filename)
+        ret_err(ERR_INVALID_ARGS);
+
+    reserved = ~(1U << 3);
+    mode = (accessMode & reserved) | (sharingMode << 4) | (inheritenceMode << 7);
+
+    file = xopen_file(filename, mode);
+    if (file < 0) // returns negative of the error code
+    {
+        if (!RETURN_EXTENDED_ERRORS)
+            ret_err(-file);
+        else
+        {
+            extErr = xget_ext_error();
+            ret_err(extErr);
+        }
+    }
+
+    errnum = ERR_NO_ERR;
+    return file;
+}
+
 void main()
 {
     video_mode(BWT_MODE);

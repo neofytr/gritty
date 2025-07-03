@@ -3,8 +3,8 @@
 
 #include <base.h>
 
-// support for upto 16 bit RGB color depth bmp files with no compression
-// 24 bit color depth bmp files are not supported
+// This library is for parsing 4-bit color depth, uncompressed BMP files
+#define NUM_COLORS 16
 
 // infoHeader_t.compression can be any of the following
 #define BI_RGB 0  // no compression
@@ -25,7 +25,7 @@ typedef struct packed
     uint32_t width;        // horizontal width of bitmap in pixels
     uint32_t height;       // vertical height of bitmap in pixels
     uint16_t planes;       // number of planes (1)
-    uint16_t bitsPerPixel; // this can be 1 (monochrome pallete), 4 (16 color pallete), 8 (256 color pallete), and 16 (256 color pallete)
+    uint16_t bitsPerPixel; // this can be 1 (monochrome pallete), 4 (16 color pallete), 8 (256 color pallete), 16 (256 color pallete) or 24 (24 bit color depth)
     uint32_t compression;
     uint32_t imageSize;       // (compressed) size of image; can be 0 if compression is 0
     uint32_t xPixelsPerM;     // horizontal resolution (pixels / metre)
@@ -33,5 +33,14 @@ typedef struct packed
     uint32_t colorsUsed;      // number of colors actually used
     uint32_t importantColors; // number of important colors (0 = all)
 } infoHeader_t;
+
+typedef struct packed
+{
+    header_t *header;
+    infoHeader_t *infoHeader;
+    uint32_t colorTable[NUM_COLORS];
+} bmp_t; 
+
+
 
 #endif // __BMP_H__
