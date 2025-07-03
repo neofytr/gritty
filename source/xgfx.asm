@@ -18,6 +18,7 @@ global xvideo_mode
 global xdraw_point_scg
 global xdraw_point_bwt
 global xget_more_err_info
+global xopen_file
 
 exit:
     ; function prologue
@@ -178,6 +179,27 @@ xget_more_err_info:
     mov BYTE [dx], bl ; BL contains the suggested action
 
     restore
+    mov esp, ebp
+    pop ebp
+    ret
+
+xopen_file:
+    push ebp
+    mov  ebp, esp
+    save 
+
+    arg_word dx, 0 ; filename
+    arg_byte al, 1 ; mode 
+
+    ; open file using handle (int 0x21, 0x3D) 
+    mov ah, 0x3d
+    int 0x21
+
+    jnc .open_file_leave ; if the CF is not set, there is no error and the file handle is in AX
+    neg ax               ; return negative of the error code
+    
+.open_file_leave:
+    restore 
     mov esp, ebp
     pop ebp
     ret
