@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+// all these functions return negative of the error code upon error
+// 0 upon success
+
 void xputchar(uint8_t chr);
 void xwrite(uint8_t chr);
 void xvideo_mode(uint8_t mode);

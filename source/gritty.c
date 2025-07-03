@@ -100,7 +100,35 @@ fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingM
     }
 
     errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ERR_NO_ERR;
     return file;
+}
+
+boolean closeFile(fileHandle_t file)
+{
+    uint16_t err, act;
+    err = xclose_file(file);
+    if (err < 0)
+    {
+        if (RETURN_EXTENDED_ERRORS || RETURN_ACTION)
+        {
+            xget_more_err_info(&err, &act);
+            if (RETURN_EXTENDED_ERRORS)
+                errnum = err;
+            if (RETURN_ACTION)
+                action = act;
+        }
+        else
+            errnum = -err;
+
+        return false;
+    }
+
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
+    return true;
 }
 
 void main()

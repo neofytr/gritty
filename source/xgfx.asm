@@ -19,6 +19,7 @@ global xdraw_point_scg
 global xdraw_point_bwt
 global xget_more_err_info
 global xopen_file
+global xclose_file
 
 exit:
     ; function prologue
@@ -206,5 +207,28 @@ xopen_file:
     mov esp, ebp
     pop ebp
     ret
+
+xclose_file:
+    push ebp
+    mov  ebp, esp
+    save 
+
+    ; close file using handle (int 0x21, 0x3e)
+    arg_word bx, 0    ; file handle to close
+    mov      ah, 0x3e
+    int      0x21
+
+    jnc .close_file_leave
+    neg ax                ; return negative of the error code
+
+.close_file_leave:
+    restore 
+    mov ax,  0x00 ; success 
+    mov esp, ebp
+    pop ebp
+    ret
+
+
+    
 
     
