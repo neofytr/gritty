@@ -17,7 +17,7 @@ global xgetchar
 global xvideo_mode
 global xdraw_point_scg
 global xdraw_point_bwt
-global xdraw_point_bwg
+global xget_more_err_info
 
 exit:
     ; function prologue
@@ -53,7 +53,7 @@ exit:
 
 xwrite:
     push ebp      ; save the base ptr
-    mov  ebp, esp ; make the current stack ptr the current base ptr
+    mov  ebp, esp ; make the current stack ptr the current base ptr 
 
     mov dl, BYTE [ebp + 8]
     mov ah, 0x02           ; int 0x21 with ah = 0x02 prints the character in dl
@@ -66,6 +66,7 @@ xwrite:
 xputchar:
     push ebp
     mov  ebp, esp
+    save
 
     arg_byte al, 0
     mov      ah, 0x0E
@@ -73,6 +74,7 @@ xputchar:
     xor      bl, bl
     int      0x10
 
+    restore
     mov esp, ebp
     pop ebp
     ret
@@ -80,24 +82,28 @@ xputchar:
 xgetchar:
     push ebp
     mov  ebp, esp
+    save
 
     xor ah, ah
     int 0x16
 
     ; the return value is already in ax
 
+    restore
     mov esp, ebp
     pop ebp
     ret
 
-xvideo_mode:
+xvideo_mode: 
     push ebp
     mov  ebp, esp
+    save
 
     arg_byte al, 0  ; put the mode into al 
     xor      ah, ah
     int      0x10
 
+    restore
     mov esp, ebp
     pop ebp
     ret
@@ -108,6 +114,7 @@ xvideo_mode:
 xdraw_point_bwt:
     push ebp
     mov  ebp, esp
+    save
 
     ; change cursor position (int 0x10, 0x02)
     arg_byte dl, 0
@@ -126,6 +133,7 @@ xdraw_point_bwt:
 
     mov eax, 0x01 ; true return value
 
+    restore
     mov esp, ebp
     pop ebp
     ret
@@ -133,6 +141,7 @@ xdraw_point_bwt:
 xdraw_point_scg:
     push ebp
     mov  ebp, esp
+    save
 
     arg_word cx, 0
     arg_word dx, 1
@@ -145,25 +154,24 @@ xdraw_point_scg:
 
     mov eax, 0x01
 
+    restore
     mov esp, ebp
     pop ebp
     ret
 
-xdraw_point_bwg:
+xget_more_err_info:
     push ebp
     mov  ebp, esp
+    save
 
-    arg_word cx, 0
-    arg_word dx, 1
+    ; get extended error information  (int 0x21, 0x59)
+    mov ah, 0x59
+    xor bx, bx
+    int 0x21
 
-    ; write graphics pixel at coordinate (int 0x10, 0xc)
-    mov ah, 0x0c
-    xor al, al  ; color doesn't matter in BW Graphics mode
-    xor bh, bh   ; page number 0
-    int 0x10
-
-    mov eax, 0x01
-
+    restore
     mov esp, ebp
     pop ebp
     ret
+
+    

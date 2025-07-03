@@ -147,4 +147,35 @@ const char *errToString(error_t errnum)
     default:
         return "Unknown DOS error";
     }
+
+    return 0;
+}
+
+const char *actionToString(action_t action)
+{
+    switch (action)
+    {
+    case ACTION_NO_ACTION:
+        return "No error; No action required";
+    case ACTION_RETRY:
+        return "Retry: attempt a few more times and re-prompt";
+    case ACTION_DELAY_RETRY:
+        return "Delay retry: pause, then retry a few more times";
+    case ACTION_REENTER_INPUT:
+        return "Re-enter input: prompt user to re-enter input";
+    case ACTION_ABORT_WITH_CLEANUP:
+        return "Abort with cleanup: orderly abort and shutdown";
+    case ACTION_IMMEDIATE_ABORT:
+        return "Immediate abort: exit immediately without cleanup";
+    case ACTION_IGNORE:
+        return "Ignore the error";
+    case ACTION_USER_INTERVENTION:
+        return "User intervention required: retry after user fixes the problem";
+    case ACTION_FIX_ARGS:
+        return "Fix the function arguments";
+    default:
+        return "Unknown or undefined error action";
+    }
+
+    return 0;
 }

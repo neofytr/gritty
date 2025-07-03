@@ -5,6 +5,7 @@
 #include <base.h>
 
 #define RETURN_EXTENDED_ERRORS false
+#define RETURN_ACTION false
 
 typedef enum
 {
@@ -102,26 +103,28 @@ typedef enum
     ERR_INVALID_ARGS = 0x5B,
 } error_t;
 
+typedef enum
+{
+    ACTION_NO_ACTION = 0x00,
+    ACTION_RETRY = 0x01,              // retry a few more times and re-prompt
+    ACTION_DELAY_RETRY = 0x02,        // delay retry after a pause
+    ACTION_REENTER_INPUT = 0x03,      // prompt user to re-enter input
+    ACTION_ABORT_WITH_CLEANUP = 0x04, // orderly abort and shutdown
+    ACTION_IMMEDIATE_ABORT = 0x05,    // immediate abort
+    ACTION_IGNORE = 0x06,             // ignore the error
+    ACTION_USER_INTERVENTION = 0x07,  // retry after user fixes problem
+    ACTION_FIX_ARGS = 0x08            // fix the function arguments
+} action_t;
+
 #ifdef INSIDE_GRITTY
 error_t errnum = ERR_NO_ERR;
+action_t action = ACTION_NO_ACTION;
 #else
 extern error_t errnum;
+extern action_t action;
 #endif // INSIDE_GRITTY
 
-#define ret_err(error)  \
-    do                  \
-    {                   \
-        errnum = error; \
-        return -1;      \
-    } while (false)
-
-#define ret_success()        \
-    do                       \
-    {                        \
-        errnum = ERR_NO_ERR; \
-        return 0;            \
-    } while (false)
-
 const char *errToString(error_t errnum);
+const char *actionToString(action_t action);
 
 #endif

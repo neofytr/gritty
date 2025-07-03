@@ -69,10 +69,15 @@ void freeall(void)
 fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingMode, uint8_t inheritenceMode)
 {
     uint8_t mode, reserved;
-    uint16_t extErr;
     fileHandle_t file;
+    uint16_t err, act;
     if (!filename)
-        ret_err(ERR_INVALID_ARGS);
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
+        return -1;
+    }
 
     reserved = ~(1U << 3);
     mode = (accessMode & reserved) | (sharingMode << 4) | (inheritenceMode << 7);
@@ -80,13 +85,18 @@ fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingM
     file = xopen_file(filename, mode);
     if (file < 0) // returns negative of the error code
     {
-        if (!RETURN_EXTENDED_ERRORS)
-            ret_err(-file);
-        else
+        if (RETURN_EXTENDED_ERRORS || RETURN_ACTION)
         {
-            extErr = xget_ext_error();
-            ret_err(extErr);
+            xget_more_err_info(&err, &act);
+            if (RETURN_EXTENDED_ERRORS)
+                errnum = err;
+            if (RETURN_ACTION)
+                action = act;
         }
+        else
+            errnum = -file;
+
+        return -1;
     }
 
     errnum = ERR_NO_ERR;
