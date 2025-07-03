@@ -25,7 +25,7 @@ typedef int16_t fileHandle_t;
 
 extern uint8_t __heap; // symbol exported by the linker script
 
-void print(uint8_t *str);
+void print(const char *str);
 void putchar(uint8_t chr);
 uint8_t getchar(void);
 void *alloc(uint16_t size);

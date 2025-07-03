@@ -256,6 +256,15 @@ xread_file:
     pop ebp
     ret
 
+xwrite_file:
+    push ebp
+    mov  ebp, esp
+    save 
+
+
+    restore 
+    mov esp, ebp
+    ret
 
 
     

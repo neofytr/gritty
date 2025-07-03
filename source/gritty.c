@@ -32,7 +32,7 @@ uint8_t getchar(void)
     return ret;
 }
 
-void print(uint8_t *str)
+void print(const char *str)
 {
     if (!str)
         return;
@@ -101,15 +101,17 @@ fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingM
 
     errnum = ERR_NO_ERR;
     if (RETURN_ACTION)
-        action = ERR_NO_ERR;
+        action = ACTION_NO_ACTION;
     return file;
 }
 
 boolean closeFile(fileHandle_t file)
 {
+    int16_t ret;
     uint16_t err, act;
-    err = xclose_file(file);
-    if (err < 0)
+
+    ret = xclose_file(file);
+    if (ret < 0)
     {
         if (RETURN_EXTENDED_ERRORS || RETURN_ACTION)
         {
@@ -120,7 +122,7 @@ boolean closeFile(fileHandle_t file)
                 action = act;
         }
         else
-            errnum = -err;
+            errnum = -ret;
 
         return false;
     }
@@ -203,9 +205,22 @@ int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer)
 
 void main()
 {
-    uint8_t ret;
+    int16_t ret;
+    uint8_t buf[32];
 
     video_mode(BWT_MODE);
-    ret = openFile("C:\\GRITTY.COM", READ_ONLY, EVERYONE_FULL_ACCESS, INHERITABLE);
+    ret = openFile("C:\\HELLO.BIN", READ_ONLY, EVERYONE_FULL_ACCESS, INHERITABLE);
+    if (ret < 0)
+    {
+        print("Error opening file\n");
+        return;
+    }
+
+    ret = readFile(ret, 32, buf);
+    if (ret < 0)
+        print("Error reading file\n");
+
+    print((const char *)buf);
+
     return;
 }
