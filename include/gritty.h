@@ -7,18 +7,21 @@
 
 typedef int16_t fileHandle_t;
 
-#define READ_ONLY 0x0000
-#define WRITE_ONLY 0x0001
-#define READ_WRITE 0x0002
+#include <stdint.h>
 
-#define EXCLUSIVE_ACCESS 0x0000
-#define DENY_OTHERS_READWRITE 0x0001
-#define DENY_OTHERS_WRITE 0x0010
-#define DENY_OTHERS_WRITE 0x0011
-#define EVERYONE_FULL_ACCESS 0x0100
+#define READ_ONLY ((uint8_t)0x00)
+#define WRITE_ONLY ((uint8_t)0x01)
+#define READ_WRITE ((uint8_t)0x02)
 
-#define PRIVATE 0x0001
-#define INHERITABLE 0x0000
+#define EXCLUSIVE_ACCESS ((uint8_t)0x00) // deny all
+#define DENY_OTHERS_READWRITE ((uint8_t)0x04)
+#define DENY_OTHERS_WRITE ((uint8_t)0x08)
+#define DENY_OTHERS_READ ((uint8_t)0x0C)
+#define EVERYONE_FULL_ACCESS ((uint8_t)0x10)
+
+// Inheritance flag (bit 4)
+#define INHERITABLE ((uint8_t)0x00)
+#define PRIVATE ((uint8_t)0x20)
 
 extern uint8_t __heap; // symbol exported by the linker script
 

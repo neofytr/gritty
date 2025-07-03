@@ -66,6 +66,7 @@ int main(int argc, char **argv)
 
     neo_compile_to_object_file(GCC, SRC "gritty.c", BIN "gritty.o", CFLAGS, false);
     neo_compile_to_object_file(GCC, SRC "shapes.c", BIN "shapes.o", CFLAGS, false);
+    neo_compile_to_object_file(GCC, SRC "errnum.c", BIN "errnum.o", CFLAGS, false);
 
     cmd = neocmd_create(BASH);
 
@@ -78,7 +79,7 @@ int main(int argc, char **argv)
     neocmd_run_sync(cmd, NULL, NULL, false);
 
     // link xgfx.o with gritty.o
-    neo_link(LD, BIN "gritty.com", LFLAGS, false, BIN "gritty.o", BIN "xgfx.o", BIN "shapes.o");
+    neo_link(LD, BIN "gritty.com", LFLAGS, false, BIN "gritty.o", BIN "xgfx.o", BIN "shapes.o", BIN "errnum.o");
 
     if (argc > 1 && !strcmp(argv[1], "dis"))
     {

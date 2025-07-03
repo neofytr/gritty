@@ -68,22 +68,22 @@ bits 16
 ; use this macro to access arguments passed to the function
 ; arg <dest reg>, <arg num>
 %macro arg_byte 2 
-    %%offset equ ((4 * %2) + 4 * (2 + 3)) ; // return addr, prev base ptr, ebx, edi, esi
+    %%offset equ ((4 * %2) + 4 * 2) ; // return addr, prev base ptr
     mov %1, BYTE [ebp + %%offset]
 %endmacro
 
 %macro arg_word 2 
-    %%offset equ ((4 * %2) + 4 * (2 + 3)
+    %%offset equ ((4 * %2) + 4 * 2)
     mov %1, WORD [ebp + %%offset]
 %endmacro
 
-%macro save 
+%macro save 0
     push ebx
     push edi
     push esi
 %endmacro
 
-%macro restore 
+%macro restore 0
     pop esi
     pop edi
     pop ebx

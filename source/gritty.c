@@ -79,8 +79,8 @@ fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingM
         return -1;
     }
 
-    reserved = ~(1U << 3);
-    mode = (accessMode & reserved) | (sharingMode << 4) | (inheritenceMode << 7);
+    reserved = (uint8_t)~(1 << 3);
+    mode = (uint8_t)(accessMode & reserved) | (uint8_t)(sharingMode << 4) | (uint8_t)(inheritenceMode << 7);
 
     file = xopen_file(filename, mode);
     if (file < 0) // returns negative of the error code
@@ -105,6 +105,9 @@ fileHandle_t openFile(const char *filename, uint8_t accessMode, uint8_t sharingM
 
 void main()
 {
+    uint8_t ret;
+
     video_mode(BWT_MODE);
+    ret = openFile("C:\\GRITTY.COM", READ_ONLY, EVERYONE_FULL_ACCESS, INHERITABLE);
     return;
 }

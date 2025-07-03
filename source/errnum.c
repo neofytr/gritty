@@ -144,6 +144,8 @@ const char *errToString(error_t errnum)
         return "Required system component not installed";
     case ERR_INVALID_ARGS:
         return "Invalid arguments passed to the function";
+    case ERR_NO_ERR:
+        return "No error";
     default:
         return "Unknown DOS error";
     }

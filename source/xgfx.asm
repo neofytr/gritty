@@ -55,11 +55,14 @@ exit:
 xwrite:
     push ebp      ; save the base ptr
     mov  ebp, esp ; make the current stack ptr the current base ptr 
-
+    save
+    
     mov dl, BYTE [ebp + 8]
     mov ah, 0x02           ; int 0x21 with ah = 0x02 prints the character in dl
     int 0x21
 
+    restore
+    pop ebx
     mov esp, ebp
     pop ebp
     ret 
@@ -165,8 +168,8 @@ xget_more_err_info:
     mov  ebp, esp
     save
 
-    arg_word cx, 0 ; err
-    arg_word dx, 1 ; act
+    arg_word si, 0 ; err
+    arg_word di, 1 ; act
 
     ; get extended error information  (int 0x21, 0x59)
     mov ah, 0x59
@@ -175,8 +178,8 @@ xget_more_err_info:
 
     ; AX contains the returned extended error code 
     ; These can fit into a byte, so, we use the lower byte of AX
-    mov BYTE [cx], al
-    mov BYTE [dx], bl ; BL contains the suggested action
+    mov BYTE [si], al
+    mov BYTE [di], bl ; BL contains the suggested action
 
     restore
     mov esp, ebp

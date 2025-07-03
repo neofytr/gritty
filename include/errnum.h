@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <base.h>
 
-#define RETURN_EXTENDED_ERRORS false
-#define RETURN_ACTION false
+#define RETURN_EXTENDED_ERRORS true
+#define RETURN_ACTION true
 
 typedef enum
 {
