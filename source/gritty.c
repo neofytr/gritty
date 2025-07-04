@@ -16,6 +16,7 @@ static void *curr_heap;
 static boolean alloc_init = false;
 
 static int16_t vprintFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, va_list args);
+static int16_t vprintFormattedToFile(fileHandle_t fileHandle, const char *format, va_list args);
 
 int16_t print(const char *str)
 {
@@ -156,14 +157,12 @@ int16_t printFormatted(const char *format, ...)
 
 static int16_t vprintFormattedToFile(fileHandle_t fileHandle, const char *format, va_list args)
 {
-    va_list args;
-    int8_t buf[PRINTF_BUF_LEN];
+    uint8_t buf[PRINTF_BUF_LEN];
     int16_t ret;
     int16_t len;
 
     // this call can't fail
     len = vprintFormattedToBuffer(buf, PRINTF_BUF_LEN, format, args);
-    va_end(args);
 
     ret = writeFile(fileHandle, len, buf);
     return ret;
