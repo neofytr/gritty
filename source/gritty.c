@@ -39,14 +39,22 @@ int16_t print(const char *str)
 
 static int16_t vprintFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, va_list args)
 {
-    uint8_t numBuf[16] = {0};
+    uint8_t numBuf[32] = {0};
     uint16_t numIndex;
     boolean isNeg;
-    int16_t num;
+    int32_t num;
+    uint32_t unum;
     uint8_t *ptr;
     uint16_t len;
     int16_t tmp;
     uint16_t bufIndex, formatIndex;
+    const char *str;
+    uint8_t *strPtr;
+    uint16_t strLen;
+    uint8_t ch;
+    uint8_t base;
+    const char *hexChars = "0123456789abcdef";
+
     if (!format)
     {
         errnum = ERR_INVALID_ARGS;
@@ -62,7 +70,7 @@ static int16_t vprintFormattedToBuffer(uint8_t *buf, uint16_t max_len, const cha
         len++;
 
     bufIndex = formatIndex = 0;
-    while (bufIndex < max_len - 1) // last byte is strictly for the null byte
+    while (bufIndex < max_len - 1)
     {
         if (formatIndex >= len)
             break;
@@ -83,7 +91,7 @@ static int16_t vprintFormattedToBuffer(uint8_t *buf, uint16_t max_len, const cha
             else if (format[formatIndex + 1] == 'd')
             {
                 formatIndex += 2;
-                num = va_arg(args, int32_t); // int16_t would be automatically promoted anyway
+                num = va_arg(args, int32_t);
 
                 numIndex = 0;
                 isNeg = num < 0;
@@ -106,11 +114,152 @@ static int16_t vprintFormattedToBuffer(uint8_t *buf, uint16_t max_len, const cha
                 if (isNeg)
                     numBuf[numIndex++] = '-';
 
-                numBuf[numIndex++] = 0;
                 for (tmp = numIndex - 1; tmp >= 0; tmp--)
                 {
                     if (bufIndex >= max_len - 1)
-                        break; // safety check
+                        break;
+                    buf[bufIndex++] = numBuf[tmp];
+                }
+            }
+            else if (format[formatIndex + 1] == 'u')
+            {
+                formatIndex += 2;
+                unum = va_arg(args, uint32_t);
+
+                numIndex = 0;
+                if (!unum)
+                {
+                    numBuf[numIndex++] = '0';
+                }
+                else
+                {
+                    while (unum)
+                    {
+                        numBuf[numIndex++] = unum % 10 + '0';
+                        unum /= 10;
+                    }
+                }
+
+                for (tmp = numIndex - 1; tmp >= 0; tmp--)
+                {
+                    if (bufIndex >= max_len - 1)
+                        break;
+                    buf[bufIndex++] = numBuf[tmp];
+                }
+            }
+            else if (format[formatIndex + 1] == 'x')
+            {
+                formatIndex += 2;
+                unum = va_arg(args, uint32_t);
+
+                numIndex = 0;
+                if (!unum)
+                {
+                    numBuf[numIndex++] = '0';
+                }
+                else
+                {
+                    while (unum)
+                    {
+                        numBuf[numIndex++] = hexChars[unum % 16];
+                        unum /= 16;
+                    }
+                }
+
+                for (tmp = numIndex - 1; tmp >= 0; tmp--)
+                {
+                    if (bufIndex >= max_len - 1)
+                        break;
+                    buf[bufIndex++] = numBuf[tmp];
+                }
+            }
+            else if (format[formatIndex + 1] == 'X')
+            {
+                formatIndex += 2;
+                unum = va_arg(args, uint32_t);
+
+                numIndex = 0;
+                if (!unum)
+                {
+                    numBuf[numIndex++] = '0';
+                }
+                else
+                {
+                    while (unum)
+                    {
+                        ch = hexChars[unum % 16];
+                        if (ch >= 'a' && ch <= 'f')
+                            ch = ch - 'a' + 'A';
+                        numBuf[numIndex++] = ch;
+                        unum /= 16;
+                    }
+                }
+
+                for (tmp = numIndex - 1; tmp >= 0; tmp--)
+                {
+                    if (bufIndex >= max_len - 1)
+                        break;
+                    buf[bufIndex++] = numBuf[tmp];
+                }
+            }
+            else if (format[formatIndex + 1] == 'c')
+            {
+                formatIndex += 2;
+                ch = (uint8_t)va_arg(args, int32_t);
+                if (bufIndex < max_len - 1)
+                    buf[bufIndex++] = ch;
+            }
+            else if (format[formatIndex + 1] == 's')
+            {
+                formatIndex += 2;
+                str = va_arg(args, const char *);
+                if (str)
+                {
+                    strPtr = (uint8_t *)str;
+                    while (*strPtr && bufIndex < max_len - 1)
+                    {
+                        buf[bufIndex++] = *strPtr++;
+                    }
+                }
+                else
+                {
+                    const char *nullStr = "(null)";
+                    strPtr = (uint8_t *)nullStr;
+                    while (*strPtr && bufIndex < max_len - 1)
+                    {
+                        buf[bufIndex++] = *strPtr++;
+                    }
+                }
+            }
+            else if (format[formatIndex + 1] == 'p')
+            {
+                formatIndex += 2;
+                unum = (uint32_t)va_arg(args, void *);
+
+                if (bufIndex < max_len - 3)
+                {
+                    buf[bufIndex++] = '0';
+                    buf[bufIndex++] = 'x';
+                }
+
+                numIndex = 0;
+                if (!unum)
+                {
+                    numBuf[numIndex++] = '0';
+                }
+                else
+                {
+                    while (unum)
+                    {
+                        numBuf[numIndex++] = hexChars[unum % 16];
+                        unum /= 16;
+                    }
+                }
+
+                for (tmp = numIndex - 1; tmp >= 0; tmp--)
+                {
+                    if (bufIndex >= max_len - 1)
+                        break;
                     buf[bufIndex++] = numBuf[tmp];
                 }
             }
@@ -125,7 +274,7 @@ static int16_t vprintFormattedToBuffer(uint8_t *buf, uint16_t max_len, const cha
         }
     }
 
-    buf[bufIndex] = '\0'; // returns the number of bytes printed into the buffer (except the null-byte)
+    buf[bufIndex] = '\0';
     errnum = ERR_NO_ERR;
     if (RETURN_ACTION)
         action = ACTION_NO_ACTION;
@@ -343,7 +492,7 @@ int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer)
 
 void main()
 {
-    print("hello");
-    printFormatted("hello");
+    const char *str = "hello";
+    printFormatted("hello %s", str);
     return;
 }
