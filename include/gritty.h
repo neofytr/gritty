@@ -44,12 +44,17 @@ int16_t readFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
 // this function can be used to truncate a file to the current file position by writing zero bytes
 int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer);
 
-// returns the number of bytes written on success, -1 on error
+// returns the number of bytes written to the buffer (except the null-byte) on success, -1 on error
 // this function can be used to print a formatted string to a buffer
 // this function is strict about the last null byte; it will always ensure that there is a null-byte at the end of the buffer
 // if max_len is 1, buf[0] will be the null-byte
 int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, ...);
 
 // prints a formatted string to stdout
+// returns the number of bytes written to the STDOUT, except the null-byte, on success, and -1 on error
 int16_t printFormatted(const char *format, ...);
+
+// prints a formatted string to the specified file
+// returns the number of bytes written to the file, except the null-byte, on success, and -1 on error
+int16_t printFormattedToFile(fileHandle_t fileHandle, const char *format, ...);
 #endif
