@@ -15,6 +15,8 @@ __asm__(
 static void *curr_heap;
 static boolean alloc_init = false;
 
+static int16_t vprintFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, va_list args);
+
 int16_t print(const char *str)
 {
     const uint8_t *ptr;
@@ -34,7 +36,7 @@ int16_t print(const char *str)
     return writeFile(OUTPUT, len, (uint8_t *)str);
 }
 
-int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, ...)
+static int16_t vprintFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, va_list args)
 {
     uint8_t numBuf[16] = {0};
     uint16_t numIndex;
@@ -42,9 +44,8 @@ int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *forma
     int16_t num;
     uint8_t *ptr;
     uint16_t len;
-    uint16_t tmp;
+    int16_t tmp;
     uint16_t bufIndex, formatIndex;
-    va_list args;
     if (!format)
     {
         errnum = ERR_INVALID_ARGS;
@@ -52,8 +53,6 @@ int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *forma
             action = ACTION_FIX_ARGS;
         return -1;
     }
-
-    va_start(args, format);
 
     ptr = (uint8_t *)format;
     len = 0;
@@ -83,7 +82,7 @@ int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *forma
             else if (format[formatIndex + 1] == 'd')
             {
                 formatIndex += 2;
-                num = va_arg(args, int16_t);
+                num = va_arg(args, int32_t); // int16_t would be automatically promoted anyway
 
                 numIndex = 0;
                 isNeg = num < 0;
@@ -122,16 +121,31 @@ int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *forma
     return bufIndex;
 }
 
-int16_t printFormatted(const char *format, ...)
+int16_t printFormattedToBuffer(uint8_t *buf, uint16_t max_len, const char *format, ...)
 {
-    uint8_t buf[PRINTF_BUF_LEN];
-    int16_t len;
     va_list args;
+    int16_t ret;
 
     va_start(args, format);
-    // this function call won't fail (there is no way to fail)
-    len = printFormattedToBuffer(buf, PRINTF_BUF_LEN, format, args);
-    return writeFile(OUTPUT, (uint16_t)len, buf);
+    ret = vprintFormattedToBuffer(buf, max_len, format, args);
+    va_end(args);
+    return ret;
+}
+
+int16_t printFormattedToFile(fileHandle_t fileHandle, const char *format, ...)
+{
+    va_list args;
+    int8_t buf[PRINTF_BUF_LEN];
+    int16_t ret;
+    int16_t len;
+
+    va_start(args, format);
+    // this call can't fail
+    len = vprintFormattedToBuffer(buf, PRINTF_BUF_LEN, format, args);
+    va_end(args);
+
+    ret = writeFile(fileHandle, len, buf);
+    return ret;
 }
 
 void *alloc(uint16_t size)
@@ -297,5 +311,6 @@ int16_t writeFile(fileHandle_t fileHandle, uint16_t bytes, uint8_t *buffer)
 void main()
 {
     print("hello");
+    printFormatted("hello");
     return;
 }
