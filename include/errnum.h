@@ -101,6 +101,7 @@ typedef enum
     ERR_NETWORK_FN_NOT_SUPPORTED = 0x59,
     ERR_COMPONENT_NOT_INSTALLED = 0x5A,
     ERR_INVALID_ARGS = 0x5B,
+    ERR_INVALID_BMP = 0x5C,
 } error_t;
 
 typedef enum
@@ -113,7 +114,8 @@ typedef enum
     ACTION_IMMEDIATE_ABORT = 0x05,    // immediate abort
     ACTION_IGNORE = 0x06,             // ignore the error
     ACTION_USER_INTERVENTION = 0x07,  // retry after user fixes problem
-    ACTION_FIX_ARGS = 0x08            // fix the function arguments
+    ACTION_FIX_ARGS = 0x08,           // fix the function arguments
+    ACTION_GIVE_VALID_BMP = 0x09,     // give a valid/supported BMP file
 } action_t;
 
 #ifdef INSIDE_GRITTY

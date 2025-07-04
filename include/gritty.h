@@ -28,6 +28,8 @@ typedef int16_t fileHandle_t;
 
 extern uint8_t __heap; // symbol exported by the linker script
 
+#define dealloc(x) ;
+
 int16_t print(const char *str);
 void *alloc(uint16_t size);
 void freeall(void);
@@ -57,4 +59,5 @@ int16_t printFormatted(const char *format, ...);
 // prints a formatted string to the specified file
 // returns the number of bytes written to the file, except the null-byte, on success, and -1 on error
 int16_t printFormattedToFile(fileHandle_t fileHandle, const char *format, ...);
+
 #endif

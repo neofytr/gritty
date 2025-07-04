@@ -146,6 +146,8 @@ const char *errToString(error_t errnum)
         return "Invalid arguments passed to the function";
     case ERR_NO_ERR:
         return "No error";
+    case ERR_INVALID_BMP:
+        return "The given file is not a valid/supported BMP file";
     default:
         return "Unknown DOS error";
     }
@@ -175,6 +177,8 @@ const char *actionToString(action_t action)
         return "User intervention required: retry after user fixes the problem";
     case ACTION_FIX_ARGS:
         return "Fix the function arguments";
+    case ACTION_GIVE_VALID_BMP:
+        return "Give a valid/supported BMP file";
     default:
         return "Unknown or undefined error action";
     }

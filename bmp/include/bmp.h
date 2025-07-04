@@ -39,8 +39,9 @@ typedef struct packed
     header_t *header;
     infoHeader_t *infoHeader;
     uint32_t colorTable[NUM_COLORS];
-} bmp_t; 
+} bmp_t;
 
-
+// returns NULL on error
+bmp_t *parseBMP(const char *filename);
 
 #endif // __BMP_H__
