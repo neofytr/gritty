@@ -5,37 +5,100 @@
 bmp_t *parseBMP(const char *filename)
 {
     fileHandle_t file;
-    bmp_t *bmp;
+    bmp_t *bmp = NULL;
+    int16_t ret;
+    uint8_t *image = NULL;
+    header_t *header = NULL;
+    infoHeader_t *infoHeader = NULL;
+    uint16_t imageSize;
+
     if (!filename)
     {
         errnum = ERR_INVALID_ARGS;
         if (RETURN_ACTION)
             action = ACTION_FIX_ARGS;
-        return NULL;
+        goto _end;
     }
 
     file = openFile(filename, READ_ONLY, EVERYONE_FULL_ACCESS, INHERITABLE);
     if (file < 0)
-        return NULL; // errnum and action would automatically have been set by openFile upon failure
+        goto _end; // errnum and action would automatically have been set by openFile upon failure
 
     bmp = alloc(sizeof(bmp_t));
     if (!bmp)
-        return NULL; // errnum and action would be set by alloc
+        goto _end; // errnum and action would be set by alloc
 
-    bmp->header = alloc(sizeof(header_t));
-    if (!bmp->header)
+    header = alloc(sizeof(header_t));
+    if (!header)
+        goto _end;
+
+    infoHeader = alloc(sizeof(infoHeader_t));
+    if (!infoHeader)
+        goto _end;
+
+    ret = readFile(file, sizeof(header_t), header);
+    if (ret < 0)
+        goto _end;
+
+    if (!IS_BMP_SIG(bmp->header))
     {
-        dealloc(bmp);
-        return NULL;
+        errnum = ERR_INVALID_BMP;
+        if (RETURN_ACTION)
+            action = ACTION_GIVE_VALID_BMP;
+
+        goto _end;
     }
 
-    bmp->infoHeader = alloc(sizeof(infoHeader_t));
-    if (!bmp->infoHeader)
-    {
-        dealloc(bmp->header);
-        dealloc(bmp);
-        return NULL;
-    } 
+    ret = readFile(file, sizeof(infoHeader_t), &bmp->infoHeader);
+    if (ret < 0)
+        goto _end;
 
-    
+    if (infoHeader->compression)
+    {
+        errnum = ERR_INVALID_BMP;
+        if (RETURN_ACTION)
+            action = ACTION_GIVE_VALID_BMP;
+
+        goto _end;
+    }
+
+    imageSize = infoHeader->imageSize;
+    if (!imageSize)
+        goto _noerr_end;
+
+    ret = readFile(file, NUM_COLORS * sizeof(color_t), bmp->colorTable);
+    if (ret < 0)
+        goto _end;
+
+    image = alloc(infoHeader->imageSize * sizeof(uint8_t));
+    if (!image)
+        goto _end;
+
+    ret = readFile(file, imageSize, image);
+    if (ret < 0)
+        goto _end;
+
+    // each byte of image consists of data for two pixels (4-bit each)
+    // for each pixel, we have a 4-bit index into the color table
+
+    bmp->header = header;
+    bmp->infoHeader = infoHeader;
+
+_noerr_end:
+
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
+_end:
+
+    if (header)
+        dealloc(header);
+    if (infoHeader)
+        dealloc(infoHeader);
+    if (image)
+        dealloc(image);
+    if (file >= 0)
+        closeFile(file);
+
+    return NULL;
 }

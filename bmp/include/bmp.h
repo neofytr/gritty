@@ -11,6 +11,8 @@
 #define BI_RLE8 1 // 8 bit RLE compression
 #define BI_RLE4 2 // 4 bit RLE compression
 
+#define IS_BMP_SIG(header) ((uint8_t)((header)->signature & 0xFF) == 'B') && ((uint8_t)(((header)->signature >> 8) & 0xFF) == 'M')
+
 typedef struct packed
 {
     uint16_t signature;  // 'BM'
@@ -36,12 +38,20 @@ typedef struct packed
 
 typedef struct packed
 {
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+    uint8_t reserved; // unused (=0)
+} color_t;
+
+typedef struct packed
+{
     header_t *header;
     infoHeader_t *infoHeader;
-    uint32_t colorTable[NUM_COLORS];
+    color_t colorTable[NUM_COLORS];
 } bmp_t;
 
-// returns NULL on error
+// returns NULL on error (errnum and action set as required)
 bmp_t *parseBMP(const char *filename);
 
 #endif // __BMP_H__
