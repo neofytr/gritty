@@ -148,6 +148,12 @@ const char *errToString(error_t errnum)
         return "No error";
     case ERR_INVALID_BMP:
         return "The given file is not a valid/supported BMP file";
+    case ERR_INVALID_COLOR:
+        return "Invalid color value passed to the function";
+    case ERR_SCREEN_BOUNDS:
+        return "Screen bounds exceeded";
+    case ERR_VIDEOMODE_NOT_SET:
+        return "Video mode not set";
     default:
         return "Unknown DOS error";
     }
@@ -179,6 +185,12 @@ const char *actionToString(action_t action)
         return "Fix the function arguments";
     case ACTION_GIVE_VALID_BMP:
         return "Give a valid/supported BMP file";
+    case ACTION_FIX_COLOR:
+        return "Fix the color value";
+    case ACTION_FIX_DRAWING_BOUNDS:
+        return "Fix the drawing bounds on the screen";
+    case ACTION_SET_VIDEOMODE:
+        return "Set the video mode";
     default:
         return "Unknown or undefined error action";
     }

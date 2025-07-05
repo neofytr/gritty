@@ -102,6 +102,9 @@ typedef enum
     ERR_COMPONENT_NOT_INSTALLED = 0x5A,
     ERR_INVALID_ARGS = 0x5B,
     ERR_INVALID_BMP = 0x5C,
+    ERR_INVALID_COLOR = 0x5D,
+    ERR_SCREEN_BOUNDS = 0x5E,
+    ERR_VIDEOMODE_NOT_SET = 0x5F,
 } error_t;
 
 typedef enum
@@ -116,6 +119,10 @@ typedef enum
     ACTION_USER_INTERVENTION = 0x07,  // retry after user fixes problem
     ACTION_FIX_ARGS = 0x08,           // fix the function arguments
     ACTION_GIVE_VALID_BMP = 0x09,     // give a valid/supported BMP file
+    ACTION_FIX_COLOR = 0x0A,          // fix the color value
+    ACTION_FIX_DRAWING_BOUNDS = 0x0B, // fix the drawing bounds on the screen
+    ACTION_SET_VIDEOMODE = 0x0C,      // set the video mode
+
 } action_t;
 
 #ifdef INSIDE_GRITTY

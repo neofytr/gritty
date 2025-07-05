@@ -49,9 +49,13 @@ typedef struct packed
     header_t *header;
     infoHeader_t *infoHeader;
     color_t colorTable[NUM_COLORS];
+    uint8_t *pixelArr;
+    uint16_t pixelArrLen;
 } bmp_t;
 
 // returns NULL on error (errnum and action set as required)
 bmp_t *parseBMP(const char *filename);
+boolean renderBMP(bmp_t *bmp);
+void freeBMP(bmp_t *bmp);
 
 #endif // __BMP_H__

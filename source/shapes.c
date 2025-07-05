@@ -1,5 +1,6 @@
 #include <shapes.h>
 #include <assembly.h>
+#include <errnum.h>
 #include <gritty.h>
 
 static uint16_t max_x, max_y;
@@ -7,10 +8,16 @@ static boolean is_mode_set = false;
 static uint8_t curr_mode;
 
 static boolean draw_filled_rect(int x, int y, int w, int h, uint8_t color);
+
 void video_mode(uint8_t mode)
 {
     if (mode > MAX_MODE)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return;
+    }
 
     switch (mode)
     {
@@ -23,6 +30,9 @@ void video_mode(uint8_t mode)
         max_y = SCG_MAX_Y;
         break;
     default:
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return;
     }
 
@@ -30,6 +40,9 @@ void video_mode(uint8_t mode)
     is_mode_set = true;
     curr_mode = mode;
 
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
     return;
 }
 
@@ -37,22 +50,49 @@ point_t *mk_point(uint16_t x, uint16_t y, uint8_t color)
 {
     point_t *point = alloc(sizeof(point_t));
     if (!point)
+    {
         return NULL;
+    }
 
     point->x = x;
     point->y = y;
     point->color = color;
 
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
     return point;
 }
 
 boolean draw_point(point_t *point)
 {
     if (!point || !is_mode_set)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return false;
+    }
+
+    if (!is_mode_set)
+    {
+        errnum = ERR_VIDEOMODE_NOT_SET;
+        if (RETURN_ACTION)
+            action = ACTION_SET_VIDEOMODE;
+        return false;
+    }
 
     if (point->x > max_x || point->y > max_y)
+    {
+        errnum = ERR_SCREEN_BOUNDS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_DRAWING_BOUNDS;
         return false;
+    }
+
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
 
     switch (curr_mode)
     {
@@ -60,7 +100,12 @@ boolean draw_point(point_t *point)
         return xdraw_point_bwt(point->x, point->y);
     case SCG_MODE:
         if (point->color >= 16)
+        {
+            errnum = ERR_INVALID_COLOR;
+            if (RETURN_ACTION)
+                action = ACTION_FIX_COLOR;
             return false;
+        }
         return xdraw_point_scg(point->x, point->y, point->color);
     }
 
@@ -79,11 +124,12 @@ static boolean draw_filled_rect(int x, int y, int w, int h, uint8_t color)
             point.x = x + i;
             point.y = y + j;
 
+            // skip pixels outside screen bounds
             if (point.x > max_x || point.y > max_y)
                 continue;
 
             if (!draw_point(&point))
-                return false;
+                return false; // draw_point would set the errnum/action upon return
         }
     }
     return true;
@@ -92,7 +138,12 @@ static boolean draw_filled_rect(int x, int y, int w, int h, uint8_t color)
 line_t *mk_line(point_t *one, point_t *two, uint16_t thickness, uint8_t color)
 {
     if (!one || !two || !thickness)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return NULL;
+    }
 
     line_t *line = alloc(sizeof(line_t));
     if (!line)
@@ -103,13 +154,21 @@ line_t *mk_line(point_t *one, point_t *two, uint16_t thickness, uint8_t color)
     line->thickness = thickness;
     line->color = color;
 
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
     return line;
 }
 
 rectangle_t *mk_rect(point_t *one, point_t *three, uint16_t thickness, uint8_t fg_color, uint8_t bg_color, boolean filled)
 {
     if (!one || !three || !thickness)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return NULL;
+    }
 
     rectangle_t *rect = alloc(sizeof(rectangle_t));
     if (!rect)
@@ -122,13 +181,29 @@ rectangle_t *mk_rect(point_t *one, point_t *three, uint16_t thickness, uint8_t f
     rect->bg_color = bg_color;
     rect->filled = filled;
 
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
     return rect;
 }
 
 boolean draw_rect(rectangle_t *rect)
 {
     if (!rect || !rect->one || !rect->three)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return false;
+    }
+
+    if (!is_mode_set)
+    {
+        errnum = ERR_VIDEOMODE_NOT_SET;
+        if (RETURN_ACTION)
+            action = ACTION_SET_VIDEOMODE;
+        return false;
+    }
 
     int x0 = rect->one->x;
     int y0 = rect->one->y;
@@ -149,9 +224,30 @@ boolean draw_rect(rectangle_t *rect)
         y1 = tmp;
     }
 
+    // check if rectangle is entirely outside screen bounds
+    if (x0 > max_x || y0 > max_y || x1 < 0 || y1 < 0)
+    {
+        errnum = ERR_SCREEN_BOUNDS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_DRAWING_BOUNDS;
+        return false;
+    }
+
     int thickness = rect->thickness;
     uint8_t border = rect->bg_color;
     uint8_t fill = rect->fg_color;
+
+    // validate colors for scg mode
+    if (curr_mode == SCG_MODE)
+    {
+        if (border >= 16 || fill >= 16)
+        {
+            errnum = ERR_INVALID_COLOR;
+            if (RETURN_ACTION)
+                action = ACTION_FIX_COLOR;
+            return false;
+        }
+    }
 
     // top border
     if (!draw_filled_rect(x0, y0, x1 - x0 + 1, thickness, border))
@@ -179,6 +275,9 @@ boolean draw_rect(rectangle_t *rect)
             return false;
     }
 
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
     return true;
 }
 
@@ -203,13 +302,45 @@ boolean draw_line(line_t *line)
 {
     // check if drawing mode is active and input is valid
     if (!line || !is_mode_set)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return false;
+    }
 
     if (!line->one || !line->two)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return false;
+    }
 
     if (line->thickness >= max_y)
+    {
+        errnum = ERR_INVALID_ARGS;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_ARGS;
         return false;
+    }
+
+    if (!is_mode_set)
+    {
+        errnum = ERR_VIDEOMODE_NOT_SET;
+        if (RETURN_ACTION)
+            action = ACTION_SET_VIDEOMODE;
+        return false;
+    }
+
+    // validate color for scg mode
+    if (curr_mode == SCG_MODE && line->color >= 16)
+    {
+        errnum = ERR_INVALID_COLOR;
+        if (RETURN_ACTION)
+            action = ACTION_FIX_COLOR;
+        return false;
+    }
 
     // cache x and y values of both endpoints
     int16_t x0 = line->one->x;
@@ -274,5 +405,8 @@ boolean draw_line(line_t *line)
         }
     }
 
+    errnum = ERR_NO_ERR;
+    if (RETURN_ACTION)
+        action = ACTION_NO_ACTION;
     return true;
 }

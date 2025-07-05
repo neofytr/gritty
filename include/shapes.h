@@ -44,6 +44,13 @@ Bit 3: Intensity (bright)
 
 #define MAX_MODE 0x13
 
+typedef struct packed
+{
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+} rgb_t;
+
 // the color field does nothing in the black and white text mode
 typedef struct packed
 {
@@ -68,6 +75,29 @@ typedef struct packed
     uint8_t bg_color;     // color of the rectangle lines
     boolean filled;       // whether the rectangle is filled or not
 } rectangle_t;
+
+#ifdef INSIDE_GRITTY
+rgb_t scgPalette[NUM_COLORS] = {
+    {0, 0, 0},       // Black
+    {0, 0, 170},     // Blue
+    {0, 170, 0},     // Green
+    {0, 170, 170},   // Cyan
+    {170, 0, 0},     // Red
+    {170, 0, 170},   // Magenta
+    {170, 85, 0},    // Brown
+    {170, 170, 170}, // Light Gray
+    {85, 85, 85},    // Dark Gray
+    {85, 85, 255},   // Light Blue
+    {85, 255, 85},   // Light Green
+    {85, 255, 255},  // Light Cyan
+    {255, 85, 85},   // Light Red
+    {255, 85, 255},  // Light Magenta
+    {255, 255, 85},  // Yellow
+    {255, 255, 255}  // White
+};
+#else
+extern rgb_t *scgPalette;
+#endif
 
 void video_mode(uint8_t mode);        // set the current video mode
 boolean draw_point(point_t *point);   // draw a point on the screen
