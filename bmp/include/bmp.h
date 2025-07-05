@@ -38,9 +38,9 @@ typedef struct packed
 
 typedef struct packed
 {
-    uint8_t red;
-    uint8_t green;
     uint8_t blue;
+    uint8_t green;
+    uint8_t red;
     uint8_t reserved; // unused (=0)
 } color_t;
 

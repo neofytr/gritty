@@ -2,7 +2,7 @@
 #include <errnum.h>
 #include <gritty.h>
 
-bmp_t *parseBMP(const char *filename)
+bmp_t *parseBMP(const char *filename, uint8_t *pixelArr, uint16_t *pixelArrSize)
 {
     fileHandle_t file;
     bmp_t *bmp = NULL;
@@ -62,21 +62,24 @@ bmp_t *parseBMP(const char *filename)
         goto _end;
     }
 
-    imageSize = infoHeader->imageSize;
-    if (!imageSize)
-        goto _noerr_end;
-
     ret = readFile(file, NUM_COLORS * sizeof(color_t), bmp->colorTable);
     if (ret < 0)
         goto _end;
 
-    image = alloc(infoHeader->imageSize * sizeof(uint8_t));
+    imageSize = infoHeader->imageSize * sizeof(uint8_t);
+    if (!imageSize)
+        goto _noerr_end;
+
+    image = alloc(infoHeader->imageSize);
     if (!image)
         goto _end;
 
     ret = readFile(file, imageSize, image);
     if (ret < 0)
         goto _end;
+
+    pixelArr = image;
+    *pixelArrSize = imageSize * sizeof(uint8_t);
 
     // each byte of image consists of data for two pixels (4-bit each)
     // for each pixel, we have a 4-bit index into the color table
